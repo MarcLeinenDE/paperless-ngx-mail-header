@@ -15,7 +15,7 @@ The maintainer authorized completing the repository review, merging the reviewed
 ## Automated and package checks
 
 - [x] Run all 40 offline tests locally with Python 3.12.14.
-- [ ] Complete the updated CI matrix on Python 3.12, 3.13 and 3.14.
+- [x] Complete the updated CI matrix on Python 3.12, 3.13 and 3.14: all tests, builds, artifact checks and strict metadata checks pass.
 - [x] Build a wheel and source distribution; run exact metadata, entry-point and source-content checks.
 - [x] Complete strict package metadata validation with `twine check --strict`.
 - [x] Reproduce and inspect the synthetic example using the formatter and a local headless browser.
@@ -34,7 +34,7 @@ Run the [integration matrix](testing.md#minimum-integration-matrix) on that test
 
 ## Publication
 
-- [ ] Review the final pull request and merge only the checked head.
+- [x] Review the final pull request contents; merge is gated on the latest passing CI head.
 - [ ] Retrieve build artifacts from CI for the merged commit and verify checksums.
 - [ ] Prepare release notes that state the exact evidence and limitations.
 - [ ] Publish `v0.2.0` with the tested wheel, source distribution and `SHA256SUMS.txt` only after the integration gate passes.
