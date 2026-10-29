@@ -1,0 +1,33 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.pytest_cache/
+.ruff_cache/
+.mypy_cache/
+.coverage
+htmlcov/
+.venv/
+
+# Generated artifacts
+build/
+dist/
+*.whl
+*.tar.gz
+
+# Local and private material
+.env
+.env.*
+!.env.example
+*.eml
+*.pdf
+*.msg
+private/
+local/
+*.log
+
+# IDE/OS
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
