@@ -129,14 +129,22 @@ def import_files(session, base, cases):
                                     files={'document': (path.name, file, mime)}, timeout=90)
         response.raise_for_status()
     deadline = time.monotonic() + 600
+    previous_count = -1
     while time.monotonic() < deadline:
         docs = documents(session, base)
+        if len(docs) != previous_count:
+            print(f'Imported {len(docs)}/{len(cases)} synthetic documents', flush=True)
+            previous_count = len(docs)
         if len(docs) == len(cases):
             return {doc['title'].removeprefix('SMOKE_'): doc for doc in docs}
         tasks = get_json(session, base + 'tasks/')
         if isinstance(tasks, dict):
             tasks = tasks.get('results', [])
-        failures = [task for task in tasks if task.get('status') in ('FAILURE', 'FAILED')]
+        (REPORT / f'tasks-{base.split(":")[2].split("/")[0]}.json').write_text(
+            json.dumps(tasks, indent=2), encoding='utf-8'
+        )
+        failures = [task for task in tasks
+                    if str(task.get('status', '')).lower() in ('failure', 'failed', 'revoked')]
         assert not failures, f'Synthetic import failed: {failures}'
         time.sleep(3)
     raise TimeoutError(f'Only {len(documents(session, base))}/{len(cases)} imports completed')
