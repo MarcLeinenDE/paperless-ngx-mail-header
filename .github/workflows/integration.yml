@@ -117,3 +117,16 @@ jobs:
       - name: Remove the disposable environment and its volumes
         if: always()
         run: docker compose down --volumes --remove-orphans
+  required:
+    name: Paperless integration checks
+    if: ${{ always() }}
+    needs: [candidate, integration]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Require the shared candidate and every integration scenario to pass
+        env:
+          CANDIDATE_BUILD_RESULT: ${{ needs.candidate.result }}
+          PAPERLESS_MATRIX_RESULT: ${{ needs.integration.result }}
+        run: |
+          test "$CANDIDATE_BUILD_RESULT" = success
+          test "$PAPERLESS_MATRIX_RESULT" = success

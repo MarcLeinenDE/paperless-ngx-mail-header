@@ -50,3 +50,14 @@ The completed synthetic real-stack results and limitations are recorded in [inte
 ## Release gate
 
 A stable release requires an authorized environment, real integration smoke test, exact version report, offline tests on configured Python versions, package build and import/entrypoint check, license review, and explicit user permission to publish.
+
+## Protected main branch
+
+Changes to `main` require a pull request, an up-to-date branch and resolved review conversations, including for administrators. Force pushes and branch deletion are blocked. No second-person approval is required for this single-maintainer project; existing approvals are dismissed when new commits change a PR.
+
+Two checks from the GitHub Actions app are required before merge:
+
+- `Unit and package checks` succeeds only when every Python test/build/package matrix job succeeds.
+- `Paperless integration checks` succeeds only when the shared wheel build and every dynamically discovered language/time-zone integration job succeed.
+
+These stable check names let contributors add catalogs without updating branch protection. A failed, cancelled or skipped prerequisite does not satisfy the corresponding check. Do not use CI-skip commit messages, including for documentation-only PRs: skipping a required workflow leaves the PR blocked. Successful checks do not replace the separate release gates above.
