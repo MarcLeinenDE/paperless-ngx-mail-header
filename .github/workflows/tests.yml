@@ -38,3 +38,13 @@ jobs:
           name: distributions
           path: dist/*
           if-no-files-found: error
+  required:
+    name: Unit and package checks
+    if: ${{ always() }}
+    needs: tests
+    runs-on: ubuntu-latest
+    steps:
+      - name: Require every Python version to pass
+        env:
+          PYTHON_MATRIX_RESULT: ${{ needs.tests.result }}
+        run: test "$PYTHON_MATRIX_RESULT" = success

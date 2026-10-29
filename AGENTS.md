@@ -31,6 +31,7 @@ Read `README.md`, `docs/testing.md`, `docs/installation.md`, `LICENSES.md`, `THI
 ## Repository workflow
 
 - Use a dedicated branch and pull request. Review the complete diff before merging.
+- `main` requires the GitHub Actions checks `Unit and package checks` and `Paperless integration checks`, covering the complete Python and dynamic language/time-zone matrices. Do not use CI-skip commit messages in pull requests: skipped workflows cannot satisfy these required checks.
 - Perform publication or deployment only within the maintainer's authorized task/session. A GitHub release does not imply a PyPI upload or production deployment.
 - Never replace published release tags or assets with a different candidate. Use a new version for code changes and follow `docs/release-checklist.md`.
 - Keep documentation in English, concise and consistent with actual behavior. Explain visible default changes and migration settings.
