@@ -28,6 +28,8 @@ The `Real Paperless integration` GitHub Actions workflow starts fresh native and
 
 The synthetic cases cover HTML, plain text, CID and controlled external images, HTML with a PDF attachment, Unicode/escaping, mixed line separators, missing header fields and both DST transitions. The PDF attachment is also uploaded as a separate document. The test compares document counts, unchanged original bytes, PDF text, image presence and registry selection. The controlled image server is internal to this disposable network; no real mail is sent or fetched.
 
+The native parser requires a `From` header. Missing recipient and subject values are tested on valid messages; a separate message without `From` must be rejected identically by both stacks. The plugin does not relax native message validation.
+
 External IMAP fetching and mail-rule attachment extraction are outside this integration scope. Evidence artifacts contain synthetic PDFs, first-page PNGs, exact versions, the candidate commit and wheel SHA-256. The workflow always removes its containers and volumes afterward. These are real-stack synthetic tests, not evidence from the maintainer's production environment.
 
 ## Evidence classes

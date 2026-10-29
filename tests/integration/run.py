@@ -17,7 +17,7 @@ from email import policy
 from email.message import EmailMessage
 from pathlib import Path
 
-import fitz
+import pymupdf as fitz
 import requests
 
 ROOT = Path(__file__).resolve().parents[2]
@@ -54,7 +54,7 @@ def prepare() -> None:
     cases = [
         ('html', None), ('text', None), ('cid', None), ('external', None),
         ('html_attachment', None), ('unicode', None), ('mixed_separators', None),
-        ('missing_headers', None),
+        ('missing_headers', None), ('missing_from', None),
         ('dst_spring_before', ('Sun, 29 Mar 2026 00:59:00 +0000', '29.03.2026, 01:59 Uhr')),
         ('dst_spring_after', ('Sun, 29 Mar 2026 01:00:00 +0000', '29.03.2026, 03:00 Uhr')),
         ('dst_autumn_before', ('Sun, 25 Oct 2026 00:59:00 +0000', '25.10.2026, 02:59 Uhr')),
@@ -63,10 +63,13 @@ def prepare() -> None:
     manifest = []
     for name, date in cases:
         message = EmailMessage(policy=policy.SMTP)
-        if name != 'missing_headers':
+        if name not in ('missing_headers', 'missing_from'):
             message['From'] = 'Anna Beispiel <anna@example.org>'
             message['To'] = 'Alex Beispiel <alex@example.net>, Team <team@example.org>'
             message['Subject'] = 'Grüße & <Marker> "2026"' if name == 'unicode' else f'Smoke {name}'
+        elif name == 'missing_headers':
+            # From is mandatory upstream; recipient and subject are optional.
+            message['From'] = 'Anna Beispiel <anna@example.org>'
         message['Date'] = date[0] if date else 'Thu, 29 Oct 2026 09:15:00 +0000'
         message['Message-ID'] = f'<mail-header-smoke-{name}@example.org>'
         marker = f'BODY_{name}'
@@ -90,7 +93,8 @@ def prepare() -> None:
                 message.add_attachment(pdf, maintype='application', subtype='pdf', filename='attachment.pdf')
         (WORK / f'fixtures/{name}.eml').write_bytes(message.as_bytes())
         manifest.append({'name': name, 'file': f'{name}.eml', 'marker': marker,
-                         'date': date[1] if date else '29.10.2026, 10:15 Uhr'})
+                         'date': date[1] if date else '29.10.2026, 10:15 Uhr',
+                         'expect_rejection': name == 'missing_from'})
     manifest.append({'name': 'attachment_pdf', 'file': 'attachment.pdf',
                      'marker': 'SMOKE_PDF_ATTACHMENT_2026'})
     (WORK / 'fixtures.json').write_text(json.dumps(manifest, indent=2), encoding='utf-8')
@@ -130,24 +134,31 @@ def import_files(session, base, cases):
         response.raise_for_status()
     deadline = time.monotonic() + 600
     previous_count = -1
+    accepted = [case for case in cases if not case.get('expect_rejection')]
+    rejected = {case['file'] for case in cases if case.get('expect_rejection')}
     while time.monotonic() < deadline:
         docs = documents(session, base)
         if len(docs) != previous_count:
-            print(f'Imported {len(docs)}/{len(cases)} synthetic documents', flush=True)
+            print(f'Imported {len(docs)}/{len(accepted)} valid synthetic documents', flush=True)
             previous_count = len(docs)
-        if len(docs) == len(cases):
-            return {doc['title'].removeprefix('SMOKE_'): doc for doc in docs}
-        tasks = get_json(session, base + 'tasks/')
+        tasks = get_json(session, base + 'tasks/?page_size=100')
         if isinstance(tasks, dict):
             tasks = tasks.get('results', [])
         (REPORT / f'tasks-{base.split(":")[2].split("/")[0]}.json').write_text(
             json.dumps(tasks, indent=2), encoding='utf-8'
         )
         failures = [task for task in tasks
-                    if str(task.get('status', '')).lower() in ('failure', 'failed', 'revoked')]
-        assert not failures, f'Synthetic import failed: {failures}'
+                    if task.get('task_type') == 'consume_file'
+                    and str(task.get('status', '')).lower() in ('failure', 'failed', 'revoked')]
+        unexpected = [task for task in failures if task.get('input_data', {}).get('filename') not in rejected]
+        assert not unexpected, f'Synthetic import failed: {unexpected}'
+        expected = {task['input_data']['filename']: task for task in failures}
+        for task in expected.values():
+            assert "Missing 'from'" in str(task.get('result_data')), 'Unexpected invalid-mail failure'
+        if len(docs) == len(accepted) and set(expected) == rejected:
+            return {doc['title'].removeprefix('SMOKE_'): doc for doc in docs}
         time.sleep(3)
-    raise TimeoutError(f'Only {len(documents(session, base))}/{len(cases)} imports completed')
+    raise TimeoutError(f'Only {len(documents(session, base))}/{len(accepted)} valid imports completed')
 
 
 def download(session, url):
@@ -164,14 +175,15 @@ def version(kind):
 
 def run() -> None:
     cases = json.loads((WORK / 'fixtures.json').read_text())
+    accepted = [case for case in cases if not case.get('expect_rejection')]
     observed = {}
     for kind, port in [('native', 8000), ('plugin', 8001)]:
         session, base = api(port)
         docs = import_files(session, base, cases)
-        assert len(docs) == len(cases)
+        assert len(docs) == len(accepted)
         (REPORT / kind).mkdir(parents=True, exist_ok=True)
         results = {}
-        for case in cases:
+        for case in accepted:
             name = case['name']
             doc = docs[name]
             original = download(session, base + f'documents/{doc["id"]}/download/?original=true')
@@ -201,7 +213,7 @@ def run() -> None:
         observed[kind] = results
         print(f'{kind}: {len(docs)} original files and real PDF previews verified')
 
-    for case in cases:
+    for case in accepted:
         name = case['name']
         native = observed['native'][name]
         plugin = observed['plugin'][name]
@@ -219,11 +231,12 @@ def run() -> None:
               'workflow_run': os.environ.get('GITHUB_RUN_ID', 'local'),
               'wheel_sha256': sha(wheel.read_bytes()), 'versions': versions,
               'dependencies': {'gotenberg': '8.37', 'tika_image': '3.3.1.0', 'broker_image': 'valkey:9-alpine'},
-              'documents_per_stack': len(cases), 'results': observed,
+              'documents_per_stack': len(accepted), 'results': observed,
+              'expected_rejections_per_stack': {'missing_from.eml': "Missing 'from'"},
               'scope': 'Real REST upload, Celery consumption, registry, Tika indexing and Gotenberg PDF rendering. PDF attachment uploaded separately; external IMAP fetching and mail-rule extraction are not exercised. All input is synthetic.'}
     (REPORT / 'summary.json').write_text(json.dumps(report, ensure_ascii=False, indent=2),
                                        encoding='utf-8')
-    print(f'PASS: {len(cases)} cases per real stack; native delegation and generated PDFs checked')
+    print(f'PASS: {len(accepted)} valid cases plus matching mandatory-From rejection per real stack')
 
 
 if __name__ == '__main__':

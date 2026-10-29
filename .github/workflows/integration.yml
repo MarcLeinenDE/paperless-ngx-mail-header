@@ -31,10 +31,13 @@ jobs:
           python -m build
           python scripts/verify_distributions.py
           python tests/integration/run.py --prepare
-          python - <<'PY' >> "$GITHUB_ENV"
-          import secrets
-          print('SMOKE_PASSWORD=' + secrets.token_urlsafe(32))
-          print('SMOKE_SECRET_KEY=' + secrets.token_urlsafe(48))
+          python - <<'PY'
+          import os, secrets
+          with open(os.environ['GITHUB_ENV'], 'a') as environment:
+              for name in ('SMOKE_PASSWORD', 'SMOKE_SECRET_KEY'):
+                  value = secrets.token_urlsafe(48)
+                  print('::add-mask::' + value)
+                  environment.write(name + '=' + value + '\n')
           PY
       - name: Start disposable native and plugin stacks
         run: docker compose up --build --detach --wait --wait-timeout 600
