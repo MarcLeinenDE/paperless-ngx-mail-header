@@ -1,0 +1,42 @@
+[build-system]
+requires = ["setuptools>=77", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "paperless-ngx-mail-header"
+version = "0.2.0"
+description = "Minimal header overlay for Paperless-ngx email PDFs using the native parser"
+readme = "README.md"
+requires-python = ">=3.12"
+license = "GPL-3.0-or-later"
+authors = [{ name = "Marc Leinen" }]
+keywords = ["paperless-ngx", "email", "eml", "pdf", "parser-plugin"]
+classifiers = [
+  "Development Status :: 3 - Alpha",
+  "Programming Language :: Python :: 3",
+  "Programming Language :: Python :: 3.12",
+  "Programming Language :: Python :: 3.13",
+  "Programming Language :: Python :: 3.14",
+  "Topic :: Office/Business",
+]
+
+[project.optional-dependencies]
+test = ["pytest>=8,<10"]
+
+[project.entry-points."paperless_ngx.parsers"]
+paperless_mail_header = "paperless_ngx_mail_header.parser:MailHeaderParser"
+
+[project.urls]
+Homepage = "https://github.com/MarcLeinenDE/paperless-ngx-mail-header"
+Source = "https://github.com/MarcLeinenDE/paperless-ngx-mail-header"
+Issues = "https://github.com/MarcLeinenDE/paperless-ngx-mail-header/issues"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+
+[tool.ruff]
+target-version = "py312"
+line-length = 100
