@@ -3,4 +3,4 @@ include LICENSES.md THIRD_PARTY_NOTICES.md
 recursive-include LICENSES *.txt
 recursive-include docs *.md *.png
 recursive-include scripts *.py
-recursive-include tests *.py
+recursive-include tests *.py *.yml Dockerfile

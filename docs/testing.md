@@ -22,6 +22,14 @@ The offline suite uses pure formatter tests plus a test double for the native Pa
 | Summer/winter time | Correct Berlin-local timestamp | Metadata check and PDF view |
 | EML without expected fields | No crash, reasonable missing-value display | Test fixture |
 
+## Disposable real-stack integration
+
+The `Real Paperless integration` GitHub Actions workflow starts fresh native and plugin-enabled Paperless `3.3.0` containers with Gotenberg `8.37` and Tika `3.3.1.0`. It builds and installs the actual candidate wheel with `--no-deps`. REST uploads are processed by real Celery workers and the real parser registry; generated PDFs and searchable text are compared with the native baseline.
+
+The synthetic cases cover HTML, plain text, CID and controlled external images, HTML with a PDF attachment, Unicode/escaping, mixed line separators, missing header fields and both DST transitions. The PDF attachment is also uploaded as a separate document. The test compares document counts, unchanged original bytes, PDF text, image presence and registry selection. The controlled image server is internal to this disposable network; no real mail is sent or fetched.
+
+External IMAP fetching and mail-rule attachment extraction are outside this integration scope. Evidence artifacts contain synthetic PDFs, first-page PNGs, exact versions, the candidate commit and wheel SHA-256. The workflow always removes its containers and volumes afterward. These are real-stack synthetic tests, not evidence from the maintainer's production environment.
+
 ## Evidence classes
 
 - `LIVE_VERIFIED`: Observed through real Paperless and rendered PDF, with exact version/date recorded.

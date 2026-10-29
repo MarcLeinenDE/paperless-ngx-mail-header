@@ -23,11 +23,11 @@ The maintainer authorized completing the repository review, merging the reviewed
 
 ## Real integration gate
 
-The maintainer selected an existing test instance. Its connection details have not yet been supplied. Do not install the candidate into production to bypass this gate.
+The maintainer confirmed that no separate test instance exists. The integration workflow creates two disposable Paperless `3.3.0` stacks in GitHub Actions: one native baseline and one with the built candidate wheel. Both use real Tika and Gotenberg services. No production environment is contacted.
 
 Run the [integration matrix](testing.md#minimum-integration-matrix) on that test instance and record exact Paperless, Python, Gotenberg and plugin versions. Compare native and plugin output for HTML-only, plain-text-only, CID images, controlled external images, separate PDF attachments, escaped Unicode headers and the DST boundary. Check original EML preservation, searchable text, document counts and generated PDFs.
 
-- [ ] Access to the authorized test instance confirmed.
+- [x] Configure the disposable CI environment and synthetic fixtures.
 - [ ] Candidate wheel installed and selected through the actual parser registry.
 - [ ] Integration matrix completed; synthetic evidence reviewed.
 - [ ] An anonymized report records results, versions, candidate commit and tested wheel SHA-256.
