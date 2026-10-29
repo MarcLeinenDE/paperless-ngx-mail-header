@@ -1,57 +1,37 @@
 <!-- SPDX-License-Identifier: CC-BY-SA-4.0 -->
-# AGENTS.md — Paperless-ngx Mail Header
+# Working on Paperless-ngx Mail Header
 
-This file contains repository-wide working rules for Codex and other coding agents.
+Read `README.md`, `docs/testing.md`, `docs/installation.md`, `LICENSES.md`, `THIRD_PARTY_NOTICES.md` and the relevant source/tests before editing.
 
-## Read first
+## Architecture
 
-1. `CODEX_HANDOFF.md`
-2. `README.md`
-3. `docs/testing.md`
-4. `docs/installation.md`
-5. `LICENSES.md` and `THIRD_PARTY_NOTICES.md`
-6. Source and tests under `src/` and `tests/`
+- Keep this a small wrapper around the native Paperless mail parser. Override only the HTML-header insertion hooks.
+- Preserve original HTML text except for inserting escaped header markup. Delegate MIME parsing, CID handling, HTML sanitizing, original files, attachments, OCR, thumbnails, PDF/A, Gotenberg, Tika, indexing and workflows to Paperless.
+- Leave plain-text-only email on the native path; its template already includes mail metadata.
+- Header labels default to English. `PAPERLESS_MAIL_HEADER_LANGUAGE` selects a gettext catalog; German is included. Keep four fields, each exactly once.
+- Use the effective Paperless `settings.TIME_ZONE`, with UTC when unset, independently of language. Do not add a separate plugin time-zone setting.
+- Do not introduce additional runtime dependencies, JavaScript or network calls in the plugin.
+- Check the exact upstream parser contract before changing integration hooks.
 
-## Invariants / architecture
+## Validation and evidence
 
-- This is a **small wrapper around the built-in Paperless mail parser**, not a replacement email engine.
-- Override only the HTML-header insertion hooks needed for metadata display.
-- Preserve original HTML text exactly except for inserting header markup. Do not reserialize the message, combine the header with CSS resources, reimplement CID handling, or rewrite HTML sanitizing.
-- Keep original `.eml`, mail rules, attachment filters and imports, OCR, thumbnails, PDF/A, Gotenberg, Tika and workflows on their native Paperless paths.
-- Text-only mail must retain native behavior; the native template already provides header metadata.
-- Header labels default to English (`From`, `To`, `Date`, `Subject`). `PAPERLESS_MAIL_HEADER_LANGUAGE=de` selects German (`Von`, `An`, `Datum`, `Betreff`). Each appears exactly once. From 0.3.1 the time zone follows the effective Paperless settings.TIME_ZONE independently of language, with UTC when unset. Do not add a separate plugin time-zone variable.
-- Escape untrusted header values; do not introduce JavaScript, networking or additional runtime dependencies.
-- Consider compatibility with the exact Paperless parser methods and their upstream changes before modifying anything.
-- Document visible default changes prominently. The maintainer explicitly requested English as the new default in `0.3.0`; existing users retain German by setting the plugin language to `de`. Never install into production automatically.
+- Run relevant offline tests and catalog/package checks for behavior changes. See `docs/testing.md` and `docs/release-checklist.md` for the real-stack release gate.
+- New languages must be complete `.po`/`.mo` catalogs, automatically discoverable without a Python registry edit. Follow `docs/translations.md`.
+- Exercise representative HTML, escaping, missing fields, recipients, CID resources, text-only delegation and time-zone/DST boundaries when relevant.
+- Distinguish offline tests, synthetic real-stack checks and operator-reported production observations. Keep compatibility claims limited to the documented versions and tested paths.
+- Do not treat the production report as verification of attachments, other languages or other time zones. See `docs/production-report-0.3.1.md` for its scope.
+- Keep examples fully synthetic. Never commit real emails, documents, personal screenshots, credentials, infrastructure identifiers or production logs.
 
-## Evidence and tests
+## Licensing
 
-- The maintainer reports `0.3.1` installed in production after an upgrade from `0.1.0`; see `docs/production-report-0.3.1.md` for the narrow, maintainer-reported HTML newsletter evidence. `0.1.0` remains a historical production reference. **Never replace a production installation automatically.**
-- Current source version is `0.3.1`; time-zone validation is documented in `docs/integration-report-0.3.1.md`. Historical i18n evidence is in `docs/integration-report-0.3.0.md`. `0.2.0` is the first public version; historical integration evidence is in `docs/integration-report.md` and original source comparison in `docs/source-comparison.md`. Re-run the real-stack matrix for each new candidate.
-- New translations must use the plugin's gettext domain and include complete `.po`/`.mo` catalogs. They must be discoverable without Python registry edits; run `scripts/check_translations.py` before building. See `docs/translations.md`.
-- Run offline tests before suggesting integration. Mark fake/mock-based tests honestly; passing unit tests does not establish end-to-end compatibility.
-- Test HTML documents with complex `<head>` and `<body>` attributes, fake markup inside comments/scripts, inline CIDs, missing fields, multiple recipients, escaping, and daylight-saving time.
-- Add a separate integration test checklist; never send or fetch real email without explicit user authorization.
-- Compatibility labels must distinguish `LIVE_VERIFIED`, `UNIT_TESTED`, `NOT_VERIFIED`, `KNOWN_ISSUE`.
+- Project software and CI: `GPL-3.0-or-later`. Documentation and illustrations: `CC-BY-SA-4.0`.
+- Preserve valid third-party copyright, license and attribution notices. Record the source and license before importing third-party material.
+- Paperless-ngx remains a separate upstream project under its own license; this repository does not redistribute or relicense it.
 
-## Licensing and provenance
+## Repository workflow
 
-- Project-authored software and CI: `GPL-3.0-or-later`; documentation/illustration: `CC-BY-SA-4.0`.
-- Paperless-ngx itself is GPLv3, is not redistributed or relicensed by this project.
-- The earlier local `0.1.0` package contained a generic MIT license. It was **our original generated packaging**, not a third-party MIT dependency. Keep historical provenance correct.
-- Do not copy code from the `toweosp` alternative parser unless its exact license and attribution obligations are deliberately reviewed.
-
-## Repository operations and publication gate
-
-- **No remote repository creation, push, release, public package publish, or production deployment without explicit user authorization.**
-- The maintainer authorized the public repository and initial `0.2.0` import on 2026-10-29. Use a dedicated branch and pull request for review. The maintainer subsequently authorized completing release preparation, merging reviewed changes and publishing the GitHub release once checks pass. This does not authorize a PyPI upload or production deployment. The integration release gate below still applies.
-- Local development/build/test and drafting docs are permitted.
-- Follow the maintainer's established convention: isolated development branch, changes reviewed before `main`, versioned tags after release checks.
-- Never commit real `.eml`, private screenshots, credentials, infrastructure names/IPs, or debug logs.
-
-## Documentation style
-
-- English-first technical README and docs; factual claims must match tests.
-- Reuse visual/design conventions from `MarcLeinenDE/nr2301-api`, `nr2301-python` and `w1-nfc-reader` without copying private data.
-- Concise scope, clear status, installation, rollback, privacy/security, license and disclaimer sections.
-- Keep example header PNG fully synthetic and reproducible from its generator.
+- Use a dedicated branch and pull request. Review the complete diff before merging.
+- Perform publication or deployment only within the maintainer's authorized task/session. A GitHub release does not imply a PyPI upload or production deployment.
+- Never replace published release tags or assets with a different candidate. Use a new version for code changes and follow `docs/release-checklist.md`.
+- Keep documentation in English, concise and consistent with actual behavior. Explain visible default changes and migration settings.
+- Keep agent instructions durable and project-focused; do not add conversation transcripts, one-off approvals or private deployment histories.
