@@ -1,43 +1,27 @@
 # Release checklist for 0.2.0
 
-The maintainer authorized completing the repository review, merging the reviewed changes and publishing a GitHub release once the checks pass. Production deployment and PyPI upload are outside that authorization.
+The maintainer authorized review, merge and GitHub publication after the checks. Production deployment and PyPI upload are separate actions.
 
-## Code and provenance
+## Completed checks
 
-- [x] Compare the supplied production wheel with the initial import.
-- [x] Inspect the native parser hooks in Paperless-ngx `v3.3.0` and `v3.3.4`; the native mail parser file is identical in both releases.
-- [x] Add regression coverage and fix the mixed-line-separator insertion error and date overflow.
-- [x] Keep native mail parsing, CID resources, attachments and conversion delegated upstream.
-- [x] Record the final runtime differences in [source-comparison.md](source-comparison.md).
-- [x] Distinguish original project licensing from upstream and the historical local MIT notice.
-- [x] Include GPL and CC BY-SA license texts and third-party notices in the distributions.
+- [x] Compare the production `0.1.0` wheel with the initial import and document the two subsequent formatter fixes.
+- [x] Inspect native hooks in Paperless `3.3.0` and `3.3.4` without expanding the verified version claim.
+- [x] Pass all 40 offline tests, builds, exact distribution checks and strict metadata validation in CI on Python 3.12, 3.13 and 3.14.
+- [x] Include project license texts, third-party notices and documentation in distributions.
+- [x] Regenerate and inspect the synthetic README image.
+- [x] Install the real wheel in a disposable derived Paperless `3.3.0` image with `--no-deps` and verify actual registry selection.
+- [x] Complete real REST/worker/Tika/Gotenberg integration against a native baseline: 13 valid imports and one expected invalid-sender rejection per stack.
+- [x] Compare original bytes, document counts, searchable text and generated PDFs, including CID/external images and both DST boundaries.
+- [x] Visually inspect all 13 synthetic candidate PDFs; record exact versions, candidate commit and wheel hash in the [integration report](integration-report.md).
+- [x] Document that IMAP fetching and mail-rule attachment extraction were not tested; no production environment was accessed.
 
-## Automated and package checks
+## Publication procedure
 
-- [x] Run all 40 offline tests locally with Python 3.12.14.
-- [x] Complete the updated CI matrix on Python 3.12, 3.13 and 3.14: all tests, builds, artifact checks and strict metadata checks pass.
-- [x] Build a wheel and source distribution; run exact metadata, entry-point and source-content checks.
-- [x] Complete strict package metadata validation with `twine check --strict`.
-- [x] Reproduce and inspect the synthetic example using the formatter and a local headless browser.
-- [x] Source-check installation commands for a uv environment and the official Docker image; do not claim these are live-tested installation methods.
+1. Review the complete pull request and merge only the latest passing head.
+2. Require successful unit/package and real-stack integration workflows on the merged commit. Retrieve the exact wheel, source distribution and checksums from that integration run.
+3. Copy its final `summary.json` to the release as `integration-summary.json`; preserve synthetic PDF/PNG evidence in the release evidence archive. Verify that its wheel SHA-256 matches the asset.
+4. Write release notes with the verified Paperless version, two formatter fixes and integration scope. Do not imply compatibility with every Paperless 3.x release or a production deployment.
+5. Attach all assets, generate their SHA-256 checksums and publish `v0.2.0` only after the final workflow succeeds.
+6. Verify the public release target and uploaded asset digests, and confirm that the tag points to the checked merged commit.
 
-## Real integration gate
-
-The maintainer confirmed that no separate test instance exists. The integration workflow creates two disposable Paperless `3.3.0` stacks in GitHub Actions: one native baseline and one with the built candidate wheel. Both use real Tika and Gotenberg services. No production environment is contacted.
-
-Run the [integration matrix](testing.md#minimum-integration-matrix) on that test instance and record exact Paperless, Python, Gotenberg and plugin versions. Compare native and plugin output for HTML-only, plain-text-only, CID images, controlled external images, separate PDF attachments, escaped Unicode headers and the DST boundary. Check original EML preservation, searchable text, document counts and generated PDFs.
-
-- [x] Configure the disposable CI environment and synthetic fixtures.
-- [ ] Candidate wheel installed and selected through the actual parser registry.
-- [ ] Integration matrix completed; synthetic evidence reviewed.
-- [ ] An anonymized report records results, versions, candidate commit and tested wheel SHA-256.
-
-## Publication
-
-- [x] Review the final pull request contents; merge is gated on the latest passing CI head.
-- [ ] Retrieve build artifacts from CI for the merged commit and verify checksums.
-- [ ] Prepare release notes that state the exact evidence and limitations.
-- [ ] Publish `v0.2.0` with the tested wheel, source distribution and `SHA256SUMS.txt` only after the integration gate passes.
-- [ ] Check the public release and downloaded asset checksums.
-
-A draft release is preparation only. Do not turn it into a stable release or advertise new live compatibility results while the integration gate is pending.
+The GitHub release is the authoritative publication status. The production `0.1.0` installation must not be replaced automatically.

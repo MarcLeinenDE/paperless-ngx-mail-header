@@ -1,6 +1,6 @@
 # Changelog
 
-## [0.2.0] — initial repository version (no stable release tag yet)
+## [0.2.0] — 2026-10-29
 
 - Prepare public-repository structure, documentation and offline CI.
 - Adopt GPL-3.0-or-later for project software and CC BY-SA 4.0 for project-authored documentation and examples.
@@ -8,6 +8,7 @@
 - Fix HTML insertion offsets when standalone CR, control characters or Unicode separators precede an LF.
 - Display an unavailable date rather than failing when timezone conversion overflows Python's supported date range.
 - Expand offline tests to 40 cases, including real RFC822 address/charset decoding and DST boundaries.
+- Verify real Paperless `3.3.0` imports against a native baseline in disposable CI: 13 successful documents per stack plus identical missing-sender rejection, with PDF/PNG evidence and exact wheel hashes.
 - Include documentation and license notices in source distributions; verify package metadata and generate SHA-256 checksums in CI.
 - Add reproducible anonymized header example and Codex handoff requirements.
 - Establish provenance against the supplied production `0.1.0` wheel before the two formatter corrections: the original formatter matched byte-for-byte; the parser differs only in version, author and project URL; the package initializer differs only in its docstring and version. See `docs/source-comparison.md` for the final runtime delta.

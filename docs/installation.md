@@ -58,7 +58,7 @@ RUN uv pip install --system --no-deps /tmp/paperless_ngx_mail_header-0.2.0-py3-n
 
 Use the derived image in the services that run the Paperless webserver, consumer and workers. Keep existing volumes, environment variables and mail rules. Rebuild and recreate those services, then verify parser selection as described above. Custom images may use a virtual environment instead; install into their actual interpreter.
 
-This example is source-checked against the official Dockerfile; a Docker deployment has not been live-tested by this project. Test on a separate instance before a production update. Do not rely on installing into a disposable running container.
+The equivalent derived-image installation is exercised in the disposable Docker integration workflow on Paperless `3.3.0`; see [the integration report](integration-report.md). This is not a test of your deployment configuration. Test on a separate instance before a production update. Do not rely on installing into a disposable running container.
 
 ## Updates
 

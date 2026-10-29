@@ -41,6 +41,8 @@ External IMAP fetching and mail-rule attachment extraction are outside this inte
 
 As of 2026-10-29, the working local `0.1.0` plugin is `LIVE_VERIFIED` for the HTML four-row header on Paperless-ngx `3.3.0` based on the maintainer's report recorded in the handoff. The new `0.2.0` packaging itself is **not** live deployed. The initial import matched `0.1.0` after excluding project metadata; two later formatter edge-case corrections have regression tests; see [the source comparison](source-comparison.md).
 
+The completed synthetic real-stack results and limitations are recorded in [integration-report.md](integration-report.md). The final release must use the exact wheel from its successful integration workflow, bound by the release summary and checksums.
+
 ## Release gate
 
 A stable release requires an authorized environment, real integration smoke test, exact version report, offline tests on configured Python versions, package build and import/entrypoint check, license review, and explicit user permission to publish.
