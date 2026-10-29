@@ -2,7 +2,7 @@
 
 ## Objective
 
-The maintainer authorized creation of the public repository `MarcLeinenDE/paperless-ngx-mail-header` and the initial `0.2.0` import on 2026-10-29. Import changes through a dedicated branch and pull request before merging to `main`. A stable release, PyPI publication and production deployment remain separate actions. Preserve behavior of the working local `0.1.0` plugin. Do not introduce broader email attachment, OCR or conversion features.
+The maintainer authorized creation of the public repository `MarcLeinenDE/paperless-ngx-mail-header` and the initial `0.2.0` import on 2026-10-29. Import changes through a dedicated branch and pull request before merging to `main`. The maintainer subsequently authorized completing the release checks, merging reviewed changes and publishing the GitHub release. PyPI publication and production deployment remain separate actions. Preserve behavior of the working local `0.1.0` plugin. Do not introduce broader email attachment, OCR or conversion features.
 
 ## Production reference reported by the maintainer (2026-10-29)
 
@@ -17,7 +17,7 @@ The maintainer authorized creation of the public repository `MarcLeinenDE/paperl
 - The current implementation inherits from the native parser and overrides `generate_pdf()` and `generate_pdf_from_html()`. The formatting logic is pure Python.
 - The original local `0.1.0` source ZIP was reviewed and 22 unit tests passed in this working environment. Those tests use a native parser double and must not be marketed as integrated tests.
 - The old `0.1.0` files contained a generic MIT LICENSE generated locally, **not imported from upstream**. The prepared public source is `0.2.0` with GPL-3.0-or-later for own code.
-- Maintainer decision on 2026-10-29: start the repository at `0.2.0` if runtime code matches production. Comparison with the supplied `0.1.0` wheel confirmed that condition; see `docs/source-comparison.md`. This selects the initial repository version and does not establish new live integration results.
+- Maintainer decision on 2026-10-29: start the repository at `0.2.0` if runtime code matches production. Comparison with the supplied `0.1.0` wheel confirmed that condition at the initial import; two later formatter edge-case fixes are documented separately; see `docs/source-comparison.md`. This selects the initial repository version and does not establish new live integration results.
 - The project follows the documentation and licensing pattern of `MarcLeinenDE/nr2301-api`, `nr2301-python`, and `w1-nfc-reader`.
 
 ## Work items for Codex after authorization
@@ -30,7 +30,7 @@ The maintainer authorized creation of the public repository `MarcLeinenDE/paperl
 6. Complete licensing/provenance audit, especially no imported upstream code or screenshot assets.
 7. Validate the installation instructions for Docker and non-Docker/uv environments; production upgrades always require backup and explicit authorization.
 8. Initial repository version `0.2.0` has been selected by the maintainer after the source comparison. Complete real integration tests before a stable release tag, and record release checksums for the final published artifacts.
-9. Repository creation and the initial import are authorized. Keep the complete source import in a review pull request before merging to `main`. No automatic stable release or PyPI upload is implied.
+9. Repository creation and the initial import are authorized. Keep the complete source import in a review pull request before merging to `main`. A GitHub release is now authorized after the release checks; no PyPI upload or production deployment is implied.
 
 ## Acceptance criteria
 

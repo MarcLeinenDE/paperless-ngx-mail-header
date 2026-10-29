@@ -43,7 +43,7 @@ This file contains repository-wide working rules for Codex and other coding agen
 ## Repository operations and publication gate
 
 - **No remote repository creation, push, release, public package publish, or production deployment without explicit user authorization.**
-- The maintainer authorized the public repository and initial `0.2.0` import on 2026-10-29. Use a dedicated branch and pull request for review. This does not authorize a stable release tag, PyPI upload or production deployment.
+- The maintainer authorized the public repository and initial `0.2.0` import on 2026-10-29. Use a dedicated branch and pull request for review. The maintainer subsequently authorized completing release preparation, merging reviewed changes and publishing the GitHub release once checks pass. This does not authorize a PyPI upload or production deployment. The integration release gate below still applies.
 - Local development/build/test and drafting docs are permitted.
 - Follow the maintainer's established convention: isolated development branch, changes reviewed before `main`, versioned tags after release checks.
 - Never commit real `.eml`, private screenshots, credentials, infrastructure names/IPs, or debug logs.

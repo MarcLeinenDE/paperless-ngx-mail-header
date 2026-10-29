@@ -29,7 +29,7 @@ The offline suite uses pure formatter tests plus a test double for the native Pa
 - `NOT_VERIFIED`: Pending test or unknown compatibility.
 - `KNOWN_ISSUE`: Reproducible failure with an issue and expected mitigation.
 
-As of 2026-10-29, the working local `0.1.0` plugin is `LIVE_VERIFIED` for the HTML four-row header on Paperless-ngx `3.3.0` based on the maintainer's report recorded in the handoff. The new `0.2.0` packaging itself is **not** live deployed. Its runtime source matches `0.1.0` after excluding project metadata; see [the source comparison](source-comparison.md).
+As of 2026-10-29, the working local `0.1.0` plugin is `LIVE_VERIFIED` for the HTML four-row header on Paperless-ngx `3.3.0` based on the maintainer's report recorded in the handoff. The new `0.2.0` packaging itself is **not** live deployed. The initial import matched `0.1.0` after excluding project metadata; two later formatter edge-case corrections have regression tests; see [the source comparison](source-comparison.md).
 
 ## Release gate
 

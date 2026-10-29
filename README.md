@@ -3,7 +3,7 @@
 A lightweight, unofficial **Paperless-ngx 3** parser extension that adds an email's **sender, recipient, date and subject** above its existing HTML content in the generated PDF. Everything else stays with Paperless-ngx's native mail parser.
 
 > [!IMPORTANT]
-> This is an independent community extension, **not affiliated with, endorsed by, or officially supported by Paperless-ngx**. Version `0.2.0` is the initial public repository version; a stable release has not yet been tagged. Its formatter is byte-identical to the maintainer's production `0.1.0`; parser changes are limited to version, author and project URL. The new package itself has not been deployed to that production environment.
+> This is an independent community extension, **not affiliated with, endorsed by, or officially supported by Paperless-ngx**. Version `0.2.0` is the initial public repository version; a stable release has not yet been tagged. It is based on the maintainer's production `0.1.0`, with two targeted formatter corrections for mixed line separators and date overflow. The native-parser wrapper differs only in version, author and project URL. The new package itself has not been deployed to that production environment.
 
 ![Anonymized example of the PDF email header](docs/images/mail-header-example.png)
 
@@ -25,11 +25,13 @@ A lightweight, unofficial **Paperless-ngx 3** parser extension that adds an emai
 | --- | --- | --- |
 | Paperless-ngx `3.3.0` | **Live verified for HTML header** | Installed local `0.1.0` plugin; PDF screenshot confirms header rendering |
 | Paperless-ngx other 3.x releases | **Not verified** | Parser internals can change between versions |
-| Unit test suite | **Unit tested** | 22 tests pass locally on Python 3.12; tests use a native-parser test double, not an integrated Paperless stack |
+| Unit test suite | **Unit tested** | 40 tests pass locally on Python 3.12; tests use a native-parser test double, not an integrated Paperless stack |
 | Plain-text-only `.eml` | **Native fallback** | Verified by unit tests; integrated visual rendering not separately confirmed |
 | HTML with PDF attachments | **Native delegation** | Unit-level check; production import semantics are controlled by Paperless rules |
 
 Repository version: `0.2.0`. See [the source comparison](docs/source-comparison.md) for the evidence connecting it to the production `0.1.0` package. A stable release tag remains subject to the integration checklist.
+
+The remaining publication gates are tracked in the [release checklist](docs/release-checklist.md).
 
 ## Installation
 

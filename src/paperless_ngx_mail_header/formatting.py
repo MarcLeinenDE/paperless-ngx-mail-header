@@ -22,9 +22,9 @@ class _InsertPosition(HTMLParser):
     def __init__(self, source: str):
         super().__init__(convert_charrefs=False)
         self.source = source
-        self.line_offsets = [0]
-        for line in source.splitlines(keepends=True):
-            self.line_offsets.append(self.line_offsets[-1] + len(line))
+        # HTMLParser counts only LF as a new line. str.splitlines() also treats
+        # CR, form feeds and Unicode separators as line breaks, shifting offsets.
+        self.line_offsets = [0] + [i + 1 for i, char in enumerate(source) if char == "\n"]
         self.body_open: int | None = None
         self.head_close: int | None = None
         self.html_open: int | None = None
@@ -64,7 +64,11 @@ def _date_text(value: datetime | None) -> str:
     # For direct/standalone use, assume a naive date is in the target local time.
     if value.tzinfo is None:
         value = value.replace(tzinfo=_TIMEZONE)
-    local = value.astimezone(_TIMEZONE)
+    try:
+        local = value.astimezone(_TIMEZONE)
+    except OverflowError:
+        # A representable RFC822 date can exceed datetime's range in Berlin.
+        return "—"
     return local.strftime("%d.%m.%Y, %H:%M Uhr")
 
 

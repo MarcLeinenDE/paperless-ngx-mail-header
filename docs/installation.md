@@ -15,6 +15,17 @@ python -m build
 
 The built wheel is produced under `dist/`. Exact filename depends on version.
 
+## GitHub release files
+
+Download the wheel and `SHA256SUMS.txt` from the same [GitHub release](https://github.com/MarcLeinenDE/paperless-ngx-mail-header/releases). Verify the wheel's hash before transferring it to the Paperless environment:
+
+```bash
+sha256sum paperless_ngx_mail_header-0.2.0-py3-none-any.whl
+# Compare the complete hash with the wheel entry in SHA256SUMS.txt.
+```
+
+The project is distributed through GitHub release assets. No PyPI publication is implied.
+
 ## community-scripts Proxmox LXC + uv
 
 **Reference layout only** (verify paths and services first):
@@ -36,7 +47,18 @@ cd /opt/paperless/src
 
 ## Docker environments
 
-Use an image or persistent initialization strategy that installs the wheel into the same Python environment as Paperless. Do **not** run `pip install` into a disposable running container without a reproducible installation mechanism. The exact approach depends on your Paperless Docker deployment. Restart the Paperless service(s) after rebuilding.
+Build a derived image so installation survives container replacement. For the official Paperless `3.3.0` image, whose Dockerfile installs dependencies into system Python, an example is:
+
+```dockerfile
+FROM ghcr.io/paperless-ngx/paperless-ngx:3.3.0
+COPY paperless_ngx_mail_header-0.2.0-py3-none-any.whl /tmp/
+RUN uv pip install --system --no-deps /tmp/paperless_ngx_mail_header-0.2.0-py3-none-any.whl \
+    && rm /tmp/paperless_ngx_mail_header-0.2.0-py3-none-any.whl
+```
+
+Use the derived image in the services that run the Paperless webserver, consumer and workers. Keep existing volumes, environment variables and mail rules. Rebuild and recreate those services, then verify parser selection as described above. Custom images may use a virtual environment instead; install into their actual interpreter.
+
+This example is source-checked against the official Dockerfile; a Docker deployment has not been live-tested by this project. Test on a separate instance before a production update. Do not rely on installing into a disposable running container.
 
 ## Updates
 

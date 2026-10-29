@@ -9,6 +9,7 @@ description = "Minimal header overlay for Paperless-ngx email PDFs using the nat
 readme = "README.md"
 requires-python = ">=3.12"
 license = "GPL-3.0-or-later"
+license-files = ["LICENSE", "LICENSES.md", "THIRD_PARTY_NOTICES.md", "LICENSES/*.txt"]
 authors = [{ name = "Marc Leinen" }]
 keywords = ["paperless-ngx", "email", "eml", "pdf", "parser-plugin"]
 classifiers = [
@@ -21,7 +22,7 @@ classifiers = [
 ]
 
 [project.optional-dependencies]
-test = ["pytest>=8,<10"]
+test = ["pytest>=8,<10", "imap-tools>=1.14,<1.16"]
 
 [project.entry-points."paperless_ngx.parsers"]
 paperless_mail_header = "paperless_ngx_mail_header.parser:MailHeaderParser"

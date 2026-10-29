@@ -10,6 +10,8 @@ An external image referenced by HTML can be requested while the email PDF is gen
 
 Gotenberg `8.34` supports separate settings including `--chromium-disable-javascript=true` and `--chromium-deny-private-ips=true`. Confirm behavior on the exact deployed Gotenberg version. If you remove a restrictive `--chromium-allow-list`, private IP checks may then apply, but a broad explicit allow-list match can bypass IP-class checks: **do not blindly allow all HTTPS URLs while assuming the private-IP flag will still block internal destinations**.
 
+See the upstream [configuration reference](https://gotenberg.dev/docs/configuration) and [outbound URL filtering guide](https://gotenberg.dev/docs/outbound-url-filtering) for the exact flags, defaults and allow-list precedence. The plugin does not change these settings.
+
 Remote images may still be missing because of expired URLs, broken TLS, host blocking, cookie requirements or lazy-loading. Do not solve that by enabling JavaScript globally without a separate threat review.
 
 ## Confidential material

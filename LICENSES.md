@@ -8,7 +8,7 @@ Unless a file states otherwise, project-authored Python source, tests, build scr
 
 ## Project documentation and image
 
-Unless a file states otherwise, project-authored README, docs and the anonymized sample image are **CC BY-SA 4.0** (`CC-BY-SA-4.0`): <https://creativecommons.org/licenses/by-sa/4.0/legalcode>.
+Unless a file states otherwise, project-authored README, docs and the anonymized sample image are **CC BY-SA 4.0** (`CC-BY-SA-4.0`): <https://creativecommons.org/licenses/by-sa/4.0/legalcode>. A plain-text copy is included in [LICENSES/CC-BY-SA-4.0.txt](LICENSES/CC-BY-SA-4.0.txt), sourced from the SPDX license-list-data collection.
 
 Documentation that incorporates code snippets retains the software license for the underlying code; the documentation license does not relicense third-party software.
 
