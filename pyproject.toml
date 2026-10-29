@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "paperless-ngx-mail-header"
-version = "0.3.0"
+version = "0.3.1"
 description = "Minimal header overlay for Paperless-ngx email PDFs using the native parser"
 readme = "README.md"
 requires-python = ">=3.12"

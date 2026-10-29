@@ -3,6 +3,7 @@
 import logging
 from datetime import datetime, timezone
 from types import SimpleNamespace
+from zoneinfo import ZoneInfo
 
 import pytest
 from babel.messages.catalog import Catalog
@@ -36,12 +37,12 @@ def test_english_is_default_even_if_environment_or_os_locale_differs(monkeypatch
     result = render_header(mail())
     for label in ('From:', 'To:', 'Date:', 'Subject:'):
         assert result.count('>' + label + '<') == 1
-    assert '2026-10-29, 10:15' in result
+    assert '2026-10-29, 09:15' in result
     assert 'Uhr' not in result and 'Betreff:' not in result
 
 
 def test_german_preserves_existing_labels_and_date():
-    result = render_header(mail(), language='de')
+    result = render_header(mail(), language='de', timezone=ZoneInfo('Europe/Berlin'))
     for label in ('Von:', 'An:', 'Datum:', 'Betreff:'):
         assert result.count('>' + label + '<') == 1
     assert '29.10.2026, 10:15 Uhr' in result
@@ -85,7 +86,7 @@ def test_a_new_catalog_is_discovered_without_python_registry_changes(tmp_path, m
     result = render_header(mail(), language='fr-FR')
     assert '>Objet:<' in result
     assert 'De &amp; &lt;expéditeur&gt;:' in result
-    assert '29/10/2026 10:15' in result
+    assert '29/10/2026 09:15' in result
 
 
 def test_rtl_catalog_uses_logical_alignment_and_isolates_values(tmp_path, monkeypatch):

@@ -14,6 +14,7 @@ import sys
 from datetime import datetime, timezone
 from pathlib import Path
 from types import SimpleNamespace
+from zoneinfo import ZoneInfo
 
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "src"))
@@ -27,6 +28,7 @@ def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--language', choices=supported_languages(), default='en')
     parser.add_argument('--output', type=Path)
+    parser.add_argument('--timezone', default='Europe/Berlin', help='Simulated Paperless TIME_ZONE')
     args = parser.parse_args()
 
     example = SimpleNamespace(
@@ -35,7 +37,7 @@ def main() -> None:
         date=datetime(2026, 10, 29, 9, 15, tzinfo=timezone.utc),
         subject="Order confirmation for your records",
     )
-    markup = render_header(example, language=args.language)
+    markup = render_header(example, language=args.language, timezone=ZoneInfo(args.timezone))
     html = (
         f'<!DOCTYPE html><html lang="{args.language}"><head><meta charset="utf-8">'
         '<meta name="viewport" content="width=device-width,initial-scale=1">'

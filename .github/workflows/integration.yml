@@ -36,7 +36,17 @@ jobs:
           import json
           from paperless_ngx_mail_header.i18n import supported_languages
           base = 'tests/integration/compose.yml'
-          matrix = {'include': [{'language': code, 'compose': base if code == 'en' else base + ':tests/integration/compose.localized.yml'} for code in supported_languages()]}
+          zoned = base + ':tests/integration/compose.timezone.yml'
+          matrix = {'include': [
+              {'scenario': code, 'language': code, 'timezone': 'Europe/Berlin',
+               'timezone_set': 'true', 'compose': zoned if code == 'en' else zoned + ':tests/integration/compose.localized.yml'}
+              for code in supported_languages()
+          ] + [
+              {'scenario': 'en-new-york', 'language': 'en', 'timezone': 'America/New_York',
+               'timezone_set': 'true', 'compose': zoned},
+              {'scenario': 'en-utc-default', 'language': 'en', 'timezone': 'UTC',
+               'timezone_set': 'false', 'compose': base},
+          ]}
           print('matrix=' + json.dumps(matrix))
           PY
       - uses: actions/upload-artifact@v7
@@ -45,17 +55,20 @@ jobs:
           path: dist/*
           if-no-files-found: error
   integration:
-    name: integration (${{ matrix.language }})
+    name: integration (${{ matrix.scenario }})
     needs: candidate
     runs-on: ubuntu-latest
     timeout-minutes: 25
     strategy:
       fail-fast: false
-      max-parallel: 2
+      max-parallel: 4
       matrix: ${{ fromJSON(needs.candidate.outputs.matrix) }}
     env:
       COMPOSE_FILE: ${{ matrix.compose }}
       SMOKE_LANGUAGE: ${{ matrix.language }}
+      SMOKE_SCENARIO: ${{ matrix.scenario }}
+      SMOKE_TIME_ZONE: ${{ matrix.timezone }}
+      SMOKE_TIME_ZONE_SET: ${{ matrix.timezone_set }}
       PYTHONUNBUFFERED: "1"
     steps:
       - uses: actions/checkout@v7
@@ -83,7 +96,7 @@ jobs:
       - name: Record actual parser selection and versions
         run: |
           for service in native plugin; do
-            docker compose exec -T "$service" python3 manage.py shell -c 'import json,sys; from paperless.version import __full_version_str__; from paperless.parsers.registry import get_parser_registry; p=get_parser_registry().get_parser_for_file("message/rfc822", "fixture.eml"); print("SMOKE_VERSION=" + json.dumps({"paperless":__full_version_str__,"python":sys.version.split()[0],"parser":p.name,"parser_version":p.version}))' > "work/integration/$service-version.txt"
+            docker compose exec -T "$service" python3 manage.py shell -c 'import json,os,sys; from django.conf import settings; from paperless.version import __full_version_str__; from paperless.parsers.registry import get_parser_registry; p=get_parser_registry().get_parser_for_file("message/rfc822", "fixture.eml"); print("SMOKE_VERSION=" + json.dumps({"paperless":__full_version_str__,"python":sys.version.split()[0],"parser":p.name,"parser_version":p.version,"time_zone":settings.TIME_ZONE,"time_zone_env":os.environ.get("PAPERLESS_TIME_ZONE")}))' > "work/integration/$service-version.txt"
           done
           docker compose images --format json > work/integration/images.json
       - name: Run synthetic imports and compare real localized PDFs
@@ -94,7 +107,7 @@ jobs:
       - uses: actions/upload-artifact@v7
         if: always()
         with:
-          name: integration-evidence-${{ matrix.language }}
+          name: integration-evidence-${{ matrix.scenario }}
           path: |
             work/integration/report/
             work/integration/*-version.txt

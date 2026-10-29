@@ -1,5 +1,6 @@
 from datetime import datetime, timezone
 from types import SimpleNamespace
+from zoneinfo import ZoneInfo
 
 import pytest
 
@@ -20,7 +21,7 @@ def mail(**overrides):
 
 
 def test_exact_four_fields_and_german_timezone():
-    value = render_header(mail(), language='de')
+    value = render_header(mail(), language='de', timezone=ZoneInfo('Europe/Berlin'))
     for label in ('Von:', 'An:', 'Datum:', 'Betreff:'):
         assert value.count('>' + label + '<') == 1
     assert '29.10.2026, 08:15 Uhr' in value
@@ -30,7 +31,8 @@ def test_exact_four_fields_and_german_timezone():
 
 
 def test_summer_timezone():
-    value = render_header(mail(date=datetime(2026, 8, 2, 12, 10, tzinfo=timezone.utc)), language='de')
+    value = render_header(mail(date=datetime(2026, 8, 2, 12, 10, tzinfo=timezone.utc)),
+                          language='de', timezone=ZoneInfo('Europe/Berlin'))
     assert '02.08.2026, 14:10 Uhr' in value
 
 

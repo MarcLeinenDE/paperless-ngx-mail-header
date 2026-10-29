@@ -4,6 +4,7 @@ from datetime import datetime, timezone
 from email.message import EmailMessage
 from html import escape
 from types import SimpleNamespace
+from zoneinfo import ZoneInfo
 
 import pytest
 from imap_tools import MailMessage
@@ -31,7 +32,8 @@ def test_multiline_head_and_quoted_body_attributes(newline):
 
 
 def test_date_overflow_is_a_missing_value_instead_of_failing_conversion():
-    header = render_header(SimpleNamespace(date=datetime.max.replace(tzinfo=timezone.utc)))
+    header = render_header(SimpleNamespace(date=datetime.max.replace(tzinfo=timezone.utc)),
+                           timezone=ZoneInfo('Europe/Berlin'))
     assert header.count('>—<') == 4
 
 
@@ -43,7 +45,8 @@ def test_date_overflow_is_a_missing_value_instead_of_failing_conversion():
     (datetime(2026, 1, 2, 3, 4), "02.01.2026, 03:04 Uhr"),
 ])
 def test_dst_boundaries_and_standalone_naive_date(date, expected):
-    assert expected in render_header(SimpleNamespace(date=date), language='de')
+    assert expected in render_header(SimpleNamespace(date=date), language='de',
+                                     timezone=ZoneInfo('Europe/Berlin'))
 
 
 @pytest.mark.parametrize("charset", ["utf-8", "iso-8859-1"])
@@ -56,7 +59,7 @@ def test_real_rfc822_decoding_of_addresses_subject_and_body(charset):
     message.set_content('<html><body>Grüße aus Köln &amp; Bonn</body></html>',
                         subtype='html', charset=charset)
     parsed = MailMessage.from_bytes(message.as_bytes())
-    header = render_header(parsed, language='de')
+    header = render_header(parsed, language='de', timezone=ZoneInfo('Europe/Berlin'))
     # Address decoding belongs to imap-tools, just as it does in Paperless.
     # Check that the formatter preserves the parsed value without reparsing it.
     assert escape(parsed.from_values.full, quote=True) in header
@@ -72,3 +75,23 @@ def test_real_rfc822_decoding_of_addresses_subject_and_body(charset):
 def test_incomplete_html_fragment_keeps_its_original_text():
     original = '<div title="unterminated'
     assert add_header_to_html(original, 'HEADER') == 'HEADER' + original
+
+
+@pytest.mark.parametrize(('date', 'expected'), [
+    (datetime(2026, 3, 8, 6, 59, tzinfo=timezone.utc), '2026-03-08, 01:59'),
+    (datetime(2026, 3, 8, 7, 0, tzinfo=timezone.utc), '2026-03-08, 03:00'),
+    (datetime(2026, 11, 1, 5, 59, tzinfo=timezone.utc), '2026-11-01, 01:59'),
+    (datetime(2026, 11, 1, 6, 0, tzinfo=timezone.utc), '2026-11-01, 01:00'),
+    (datetime(2026, 1, 1, 0, 15, tzinfo=timezone.utc), '2025-12-31, 19:15'),
+])
+def test_new_york_dst_boundaries_and_previous_calendar_day(date, expected):
+    assert expected in render_header(SimpleNamespace(date=date),
+                                     timezone=ZoneInfo('America/New_York'))
+
+
+@pytest.mark.parametrize('date', [
+    datetime(2026, 8, 2, 12, 10, tzinfo=timezone.utc),
+    datetime(2026, 8, 2, 12, 10),
+])
+def test_standalone_default_is_utc_without_summer_time(date):
+    assert '2026-08-02, 12:10' in render_header(SimpleNamespace(date=date))

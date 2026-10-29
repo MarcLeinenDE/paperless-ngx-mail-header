@@ -185,6 +185,14 @@ def run() -> None:
     accepted = [case for case in cases if not case.get('expect_rejection')]
     observed = {}
     language = os.environ.get('SMOKE_LANGUAGE', 'en')
+    time_zone = os.environ.get('SMOKE_TIME_ZONE', 'UTC')
+    time_zone_set = os.environ.get('SMOKE_TIME_ZONE_SET', 'false') == 'true'
+    versions = {kind: version(kind) for kind in ('native', 'plugin')}
+    for actual in versions.values():
+        assert actual['time_zone'] == time_zone, 'Unexpected effective Paperless timezone'
+        assert actual['time_zone_env'] == (time_zone if time_zone_set else None), (
+            'Default timezone scenario must leave PAPERLESS_TIME_ZONE absent'
+        )
     wheel, = (ROOT / 'dist').glob('*.whl')
     translation = gettext.NullTranslations()
     with zipfile.ZipFile(wheel) as package:
@@ -220,11 +228,11 @@ def run() -> None:
                 if kind == 'plugin' and name not in ('text', 'attachment_pdf'):
                     for label in labels:
                         assert text.count(label) == 1, f'{name}: missing or duplicate {label}'
-                    date = parsedate_to_datetime(case['rfc822_date']).astimezone(ZoneInfo('Europe/Berlin'))
+                    date = parsedate_to_datetime(case['rfc822_date']).astimezone(ZoneInfo(time_zone))
                     date_text = date.strftime(translation.gettext('%Y-%m-%d, %H:%M'))
-                    if language == 'de':
+                    if language == 'de' and time_zone == 'Europe/Berlin':
                         assert date_text == case['date'], 'German legacy date style changed'
-                    assert date_text in text, f'{name}: incorrect localized Berlin timestamp'
+                    assert date_text in text, f'{name}: incorrect localized {time_zone} timestamp'
                     header_y = rendered[0].search_for(labels[0])[0].y0
                     body_y = rendered[0].search_for(case['marker'])[0].y0
                     assert header_y < body_y, f'{name}: header is below body'
@@ -246,7 +254,6 @@ def run() -> None:
         if name in ('text', 'attachment_pdf'):
             assert native['pdf_text'] == plugin['pdf_text'], f'{name}: native output changed'
             assert native['pages'] == plugin['pages']
-    versions = {kind: version(kind) for kind in ('native', 'plugin')}
     assert versions['native']['parser'] == 'Paperless-ngx Mail Parser'
     assert versions['plugin']['parser'] == 'Paperless-ngx Mail Header'
     assert versions['plugin']['parser_version'] == plugin_version
@@ -254,6 +261,8 @@ def run() -> None:
               'workflow_run': os.environ.get('GITHUB_RUN_ID', 'local'),
               'wheel_sha256': sha(wheel.read_bytes()), 'versions': versions,
               'header_language': language,
+              'scenario': os.environ.get('SMOKE_SCENARIO', language),
+              'time_zone': time_zone, 'time_zone_setting_present': time_zone_set,
               'dependencies': {'gotenberg': '8.37', 'tika_image': '3.3.1.0', 'broker_image': 'valkey:9-alpine'},
               'documents_per_stack': len(accepted), 'results': observed,
               'expected_rejections_per_stack': {'missing_from.eml': "Missing 'from'"},

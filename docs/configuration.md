@@ -11,7 +11,7 @@ The native parser controls ingestion and mail rules as before. Starting with `0.
 | `en` or unset | From, To, Date, Subject | `2026-10-29, 10:15` |
 | `de` | Von, An, Datum, Betreff | `29.10.2026, 10:15 Uhr` |
 
-**Upgrading from 0.2.0:** set `PAPERLESS_MAIL_HEADER_LANGUAGE=de` to retain German labels and the previous date format. English is now the default. Both languages keep the existing Europe/Berlin time zone, including DST. The plugin does not change the Paperless server's global time zone.
+**Upgrading from 0.2.0:** set `PAPERLESS_MAIL_HEADER_LANGUAGE=de` to retain German labels and the previous date format. English is now the default. Language and time zone are independent. From `0.3.1`, the header uses the Paperless-configured time zone; see below.
 
 For Docker Compose, add the setting to the existing Paperless service environment (and separate worker services if used):
 
@@ -27,6 +27,22 @@ This is an installation-wide PDF output setting. The language of the browser int
 Codes are case-insensitive; `_` and `-` are accepted as region separators. `de-DE` falls back to the shipped `de` catalog. An unsupported or unreadable catalog falls back to English with a warning, so a language configuration error does not block email processing.
 
 Additional languages can be contributed as gettext catalogs through a PR; see [the translation guide](translations.md). No new runtime dependency or Paperless source modification is required.
+
+## Header time zone
+
+Starting with `0.3.1`, the parser reads the effective `django.conf.settings.TIME_ZONE` value from its running Paperless process. Paperless configures it through `PAPERLESS_TIME_ZONE` and defaults to `UTC` when the variable is absent. The plugin also uses UTC if the effective setting is missing or empty. There is no separate plugin time-zone setting, and the plugin does not change Paperless's configuration.
+
+For example, either language can use:
+
+```ini
+PAPERLESS_TIME_ZONE=America/New_York
+```
+
+For Docker Compose, set `PAPERLESS_TIME_ZONE` in the existing Paperless service environment. For a service-based installation, use Paperless's configuration file or service environment. Restart the actual consumer, workers and webserver after changing the setting. The effective setting is authoritative; the plugin does not independently reread a different configuration file or infer a zone from the language/browser/host clock.
+
+IANA zones such as `Europe/Berlin`, `America/New_York` and `Asia/Kathmandu` preserve their date-specific UTC offsets, including daylight-saving transitions where applicable. Use `UTC` for UTC output. An invalid nonempty zone is a configuration error, rather than an instruction to silently use a different zone.
+
+**Upgrading from 0.3.0 or earlier:** those versions always displayed HTML-header dates in Europe/Berlin. If Paperless already uses Europe/Berlin, output remains unchanged. If Paperless uses another zone or its UTC default, newly generated headers now follow that setting. Existing PDFs retain their stored timestamps until explicitly regenerated.
 
 ## HTML-only mail rule
 

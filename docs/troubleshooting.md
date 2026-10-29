@@ -10,6 +10,6 @@
 
 **Import fails after an update:** Check exact Paperless and Python version, plugin selection log, traceback, then uninstall the plugin and restart the affected services to return to the native parser. Do not delete documents or disable OCR as a first response.
 
-**Wrong timestamp:** Check the message's original RFC822 Date header and timestamp parsing. The plugin formats aware dates in Europe/Berlin; it cannot correct an incorrect source Date header.
+**Wrong timestamp:** Check the message's original RFC822 Date header and timestamp parsing. From 0.3.1 the plugin formats dates in Paperless's effective TIME_ZONE (`PAPERLESS_TIME_ZONE`, default UTC); it cannot correct an incorrect source Date header. Earlier versions always used Europe/Berlin. Restart Paperless services after changing configuration, and remember existing PDFs retain their generated timestamps.
 
 **Old PDFs unchanged:** Installing this plugin affects future parsing only; reprocessing existing docs is a separate action with its own integrity/backup risks.

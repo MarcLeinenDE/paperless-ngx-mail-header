@@ -19,7 +19,7 @@ This file contains repository-wide working rules for Codex and other coding agen
 - Preserve original HTML text exactly except for inserting header markup. Do not reserialize the message, combine the header with CSS resources, reimplement CID handling, or rewrite HTML sanitizing.
 - Keep original `.eml`, mail rules, attachment filters and imports, OCR, thumbnails, PDF/A, Gotenberg, Tika and workflows on their native Paperless paths.
 - Text-only mail must retain native behavior; the native template already provides header metadata.
-- Header labels default to English (`From`, `To`, `Date`, `Subject`). `PAPERLESS_MAIL_HEADER_LANGUAGE=de` selects German (`Von`, `An`, `Datum`, `Betreff`). Each appears exactly once. The time zone remains Europe/Berlin independently of language.
+- Header labels default to English (`From`, `To`, `Date`, `Subject`). `PAPERLESS_MAIL_HEADER_LANGUAGE=de` selects German (`Von`, `An`, `Datum`, `Betreff`). Each appears exactly once. From 0.3.1 the time zone follows the effective Paperless settings.TIME_ZONE independently of language, with UTC when unset. Do not add a separate plugin time-zone variable.
 - Escape untrusted header values; do not introduce JavaScript, networking or additional runtime dependencies.
 - Consider compatibility with the exact Paperless parser methods and their upstream changes before modifying anything.
 - Document visible default changes prominently. The maintainer explicitly requested English as the new default in `0.3.0`; existing users retain German by setting the plugin language to `de`. Never install into production automatically.
@@ -27,7 +27,7 @@ This file contains repository-wide working rules for Codex and other coding agen
 ## Evidence and tests
 
 - Treat the installed local plugin `0.1.0` as a proven production reference. **Do not replace it automatically.**
-- Current source version is `0.3.0`; i18n evidence is in `docs/integration-report-0.3.0.md`. `0.2.0` is the first public version; historical integration evidence is in `docs/integration-report.md` and original source comparison in `docs/source-comparison.md`. Re-run the real-stack matrix for each new candidate.
+- Current source version is `0.3.1`; time-zone validation is documented in `docs/integration-report-0.3.1.md`. Historical i18n evidence is in `docs/integration-report-0.3.0.md`. `0.2.0` is the first public version; historical integration evidence is in `docs/integration-report.md` and original source comparison in `docs/source-comparison.md`. Re-run the real-stack matrix for each new candidate.
 - New translations must use the plugin's gettext domain and include complete `.po`/`.mo` catalogs. They must be discoverable without Python registry edits; run `scripts/check_translations.py` before building. See `docs/translations.md`.
 - Run offline tests before suggesting integration. Mark fake/mock-based tests honestly; passing unit tests does not establish end-to-end compatibility.
 - Test HTML documents with complex `<head>` and `<body>` attributes, fake markup inside comments/scripts, inline CIDs, missing fields, multiple recipients, escaping, and daylight-saving time.
