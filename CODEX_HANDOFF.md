@@ -12,8 +12,8 @@ Subsequent maintainer direction for `0.3.1`: use Paperless's effective `settings
 
 - Paperless-ngx: `3.3.0`; the production environment itself is outside this repository.
 - Consumer, Celery task worker and webserver load parser plugins.
-- Installed production plugin: `paperless-ngx-mail-header==0.1.0`; registry selected `Paperless-ngx Mail Header` for `message/rfc822`.
-- The maintainer reported a real rendered HTML email PDF showing the four-field header. No private screenshots or messages are included here.
+- Current production plugin, per subsequent maintainer report: `paperless-ngx-mail-header==0.3.1`, upgraded from `0.1.0` on 2026-10-29; registry selected `Paperless-ngx Mail Header` version `0.3.1`. See [the production report](docs/production-report-0.3.1.md) for exact versions, observed HTML newsletter behavior and untested paths.
+- The maintainer reported a successful real HTML email import and visually checked the German four-field header, Berlin-local date, Unicode/emoji, HTML layout and external images. No private screenshots or messages are included here. This is maintainer-reported evidence, not a fresh production inspection by the repository agent.
 - **Do not embed local host/IP, email addresses, logs or personal screenshots in the public repository.**
 
 ## Grounded starting facts

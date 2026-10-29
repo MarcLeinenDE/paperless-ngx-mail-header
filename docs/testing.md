@@ -43,7 +43,9 @@ External IMAP fetching and mail-rule attachment extraction are outside this inte
 - `NOT_VERIFIED`: Pending test or unknown compatibility.
 - `KNOWN_ISSUE`: Reproducible failure with an issue and expected mitigation.
 
-As of 2026-10-29, the working local `0.1.0` plugin is `LIVE_VERIFIED` for the HTML four-row header on Paperless-ngx `3.3.0` based on the maintainer's report recorded in the handoff. The new `0.2.0` packaging itself is **not** live deployed. The initial import matched `0.1.0` after excluding project metadata; two later formatter edge-case corrections have regression tests; see [the source comparison](source-comparison.md).
+On 2026-10-29 the maintainer reported a successful production upgrade from `0.1.0` to `0.3.1` on Paperless-ngx `3.3.0`, Python `3.13.14` and Gotenberg `8.34.0`, with German headers and Europe/Berlin. One real HTML newsletter import and visual PDF inspection confirmed labels, timestamp, Unicode/emoji, HTML layout, external images, PDF creation and thumbnail generation. This is `LIVE_VERIFIED` **on the basis of the maintainer's report**, not an independent production inspection by the repository agent. See [the production report and its limits](production-report-0.3.1.md). Separate PDF attachment import and other untested paths must not inherit that production status.
+
+The private `0.1.0` deployment remains historical production evidence. The initial repository import matched `0.1.0` after excluding project metadata; two later formatter edge-case corrections have regression tests; see [the source comparison](source-comparison.md).
 
 The completed synthetic real-stack results and limitations are recorded in [integration-report.md](integration-report.md). The final release must use the exact wheel from its successful integration workflow, bound by the release summary and checksums.
 

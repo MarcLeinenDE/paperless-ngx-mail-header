@@ -26,7 +26,7 @@ This file contains repository-wide working rules for Codex and other coding agen
 
 ## Evidence and tests
 
-- Treat the installed local plugin `0.1.0` as a proven production reference. **Do not replace it automatically.**
+- The maintainer reports `0.3.1` installed in production after an upgrade from `0.1.0`; see `docs/production-report-0.3.1.md` for the narrow, maintainer-reported HTML newsletter evidence. `0.1.0` remains a historical production reference. **Never replace a production installation automatically.**
 - Current source version is `0.3.1`; time-zone validation is documented in `docs/integration-report-0.3.1.md`. Historical i18n evidence is in `docs/integration-report-0.3.0.md`. `0.2.0` is the first public version; historical integration evidence is in `docs/integration-report.md` and original source comparison in `docs/source-comparison.md`. Re-run the real-stack matrix for each new candidate.
 - New translations must use the plugin's gettext domain and include complete `.po`/`.mo` catalogs. They must be discoverable without Python registry edits; run `scripts/check_translations.py` before building. See `docs/translations.md`.
 - Run offline tests before suggesting integration. Mark fake/mock-based tests honestly; passing unit tests does not establish end-to-end compatibility.
