@@ -23,4 +23,6 @@ A stable tag requires all scenario jobs and the supported-Python unit/package ma
 
 ## Scope
 
-All input is synthetic. No production installation is changed. REST uploads exercise real Celery consumption, registry selection, Tika indexing and Gotenberg rendering. The PDF attachment is uploaded separately; IMAP fetching/mail-rule extraction, other Paperless versions and production deployment are outside this scope. Historical English/German i18n evidence is in [the 0.3.0 report](integration-report-0.3.0.md).
+All input in this CI workflow is synthetic. The workflow does not change a production installation. REST uploads exercise real Celery consumption, registry selection, Tika indexing and Gotenberg rendering. The PDF attachment is uploaded separately; IMAP fetching/mail-rule extraction, other Paperless versions and production deployment are outside this CI scope. Historical English/German i18n evidence is in [the 0.3.0 report](integration-report-0.3.0.md).
+
+A subsequent [maintainer-reported production test of 0.3.1](production-report-0.3.1.md) confirms a narrower real HTML newsletter scenario on Gotenberg `8.34.0`. That report is separate evidence and does not turn all CI scenarios into production-verified paths.

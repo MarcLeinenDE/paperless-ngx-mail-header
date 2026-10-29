@@ -4,7 +4,7 @@
 
 - Upstream: <https://github.com/paperless-ngx/paperless-ngx>
 - License: GNU General Public License version 3 (GPLv3)
-- Interface source-inspected: Paperless-ngx `3.3.0` and `3.3.4` (identical native mail parser file). Production HTML-header evidence concerns `0.1.0` on `3.3.0`; new-package integration evidence is tracked separately.
+- Interface source-inspected: Paperless-ngx `3.3.0` and `3.3.4` (identical native mail parser file). Maintainer-reported production HTML-header evidence covers `0.3.1` on `3.3.0` after an upgrade from the historical `0.1.0` deployment; see [scope and limits](docs/production-report-0.3.1.md). Synthetic integration evidence is tracked separately.
 - Relationship: the plugin **inherits** the native `paperless.parsers.mail.MailDocumentParser`, calls its methods and registers with `paperless_ngx.parsers`. It does **not** include verbatim upstream Paperless source files.
 
 Paperless-ngx authors retain ownership of their project and trademarks. Its GPL applies to Paperless itself; this extension independently licenses its own project-authored source under GPL-3.0-or-later.

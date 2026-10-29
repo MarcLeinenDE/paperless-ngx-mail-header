@@ -23,13 +23,14 @@ A lightweight, unofficial **Paperless-ngx 3** parser extension that adds an emai
 
 | Component | State | Evidence |
 | --- | --- | --- |
-| Paperless-ngx `3.3.0` | **Real-stack verified with synthetic inputs** | `0.3.0`: English default and German setting, each with 13 successful documents per native/plugin instance plus matching invalid-sender rejection; [report](docs/integration-report-0.3.0.md) |
+| Paperless-ngx `3.3.0` — production | **LIVE_VERIFIED (maintainer-reported)** | `0.3.1`: upgrade from `0.1.0` and one real HTML newsletter import, German/Berlin, Python `3.13.14`, Gotenberg `8.34.0`; [scope and limits](docs/production-report-0.3.1.md) |
+| Paperless-ngx `3.3.0` — synthetic CI | **Real-stack verified with synthetic inputs** | `0.3.1`: English/German in Berlin, English in New York and UTC with no time-zone setting; 13 successful documents per native/plugin stack in each scenario plus matching invalid-sender rejection; [report](docs/integration-report-0.3.1.md) |
 | Paperless-ngx other 3.x releases | **Not verified** | Parser internals can change between versions |
 | Unit test suite | **Unit tested** | 78 offline tests; CI covers Python 3.12–3.14, with a separate real-stack matrix for every shipped language plus New York and unset-time-zone scenarios |
 | Plain-text-only `.eml` | **Native fallback verified** | Real PDF text/page count match the native baseline |
 | HTML with PDF attachments | **Native delegation** | Real EML and separate PDF uploads verified; IMAP mail-rule extraction is outside the integration scope |
 
-Release downloads are available on [GitHub Releases](https://github.com/MarcLeinenDE/paperless-ngx-mail-header/releases). See the [i18n integration report](docs/integration-report-0.3.0.md) for exact versions and scope, and the [changelog](CHANGELOG.md) for release history. The language setting below requires `0.3.0` or later.
+Release downloads are available on [GitHub Releases](https://github.com/MarcLeinenDE/paperless-ngx-mail-header/releases). See the [production report](docs/production-report-0.3.1.md) and [synthetic integration report](docs/integration-report-0.3.1.md) for their separate scopes, and the [changelog](CHANGELOG.md) for release history. The language setting below requires `0.3.0` or later.
 
 ## Header language
 
