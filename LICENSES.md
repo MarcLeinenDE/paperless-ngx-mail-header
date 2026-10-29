@@ -16,8 +16,6 @@ Documentation that incorporates code snippets retains the software license for t
 
 Paperless-ngx is a separate project under GPLv3, and its sources remain theirs. This plugin subclasses and delegates to the installed native parser rather than copying Paperless source into the repository. Third-party licenses and attribution are listed in [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md).
 
-The earlier private/local `0.1.0` distribution included an **MIT license file with the generic attribution `Paperless local integration`**, created with the initial local package. That notice was **not inherited from Paperless-ngx or the toweosp parser**. This work tree deliberately adopts the licensing policy used in the maintainer's other published repositories for new public source distribution. Do not describe this as relicensing Paperless-ngx itself.
-
 ## Contributions
 
 Contributors who submit project code agree to license their own eligible contributions under GPL-3.0-or-later; documentation is CC BY-SA 4.0 unless otherwise agreed before submission. Do not remove valid third-party notices.

@@ -1,6 +1,6 @@
 # Release checklist
 
-The maintainer authorized review, merge and GitHub publication after checks. Production deployment and PyPI upload are separate actions. Use the version in pyproject.toml; never replace an already published tag or release asset with a new candidate.
+Complete these checks before an authorized GitHub release. Production deployment and PyPI upload are separate actions. Use the version in pyproject.toml; never replace an already published tag or release asset with a new candidate.
 
 ## Required checks
 
