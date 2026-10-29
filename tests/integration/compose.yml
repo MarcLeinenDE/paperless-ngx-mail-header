@@ -1,0 +1,48 @@
+name: mail-header-smoke
+
+services:
+  broker:
+    image: valkey/valkey:9-alpine
+  gotenberg:
+    image: gotenberg/gotenberg:8.37
+    command:
+      - gotenberg
+      - --chromium-disable-javascript=true
+      - --chromium-deny-private-ips=true
+      - --chromium-allow-list=^file:///tmp/.*,^http://assets:8080(/|$)
+  tika:
+    image: apache/tika:3.3.1.0
+  assets:
+    image: python:3.13-alpine
+    command: python -m http.server 8080 --directory /assets
+    volumes:
+      - ../../work/integration/assets:/assets:ro
+  native:
+    image: ghcr.io/paperless-ngx/paperless-ngx:3.3.0
+    depends_on: [broker, gotenberg, tika, assets]
+    ports: ["127.0.0.1:8000:8000"]
+    environment: &paperless
+      PAPERLESS_REDIS: redis://broker:6379/0
+      PAPERLESS_DBENGINE: sqlite
+      PAPERLESS_TIKA_ENABLED: "1"
+      PAPERLESS_TIKA_ENDPOINT: http://tika:9998
+      PAPERLESS_TIKA_GOTENBERG_ENDPOINT: http://gotenberg:3000
+      PAPERLESS_EMAIL_PARSE_DEFAULT_LAYOUT: "3"
+      PAPERLESS_TIME_ZONE: Europe/Berlin
+      PAPERLESS_OCR_LANGUAGE: eng
+      PAPERLESS_OCR_MODE: skip
+      PAPERLESS_TASK_WORKERS: "1"
+      PAPERLESS_THREADS_PER_WORKER: "1"
+      PAPERLESS_WEBSERVER_WORKERS: "1"
+      PAPERLESS_ADMIN_USER: smoke
+      PAPERLESS_ADMIN_PASSWORD: ${SMOKE_PASSWORD:?Generate an ephemeral test password}
+      PAPERLESS_SECRET_KEY: ${SMOKE_SECRET_KEY:?Generate an ephemeral test key}
+  plugin:
+    build:
+      context: ../..
+      dockerfile: tests/integration/Dockerfile
+    depends_on: [broker, gotenberg, tika, assets]
+    ports: ["127.0.0.1:8001:8000"]
+    environment:
+      <<: *paperless
+      PAPERLESS_REDIS: redis://broker:6379/1

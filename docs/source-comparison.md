@@ -68,6 +68,6 @@ Final candidate `formatting.py` SHA-256:
 2cd93de7a94c3c28d789241973f9c7e9099b472bcbfe5abc8539fcd7516c1540
 ```
 
-The expanded offline suite contains 40 cases, including actual `imap-tools` RFC822 decoding, charset handling, DST boundaries and the two regression cases. It passes locally with Python 3.12.14. This still does not replace real Paperless/Gotenberg integration.
+The expanded offline suite contains 40 cases, including actual `imap-tools` RFC822 decoding, charset handling, DST boundaries and the two regression cases. It passes locally with Python 3.12.14. A subsequent real Paperless/Gotenberg/Tika integration run passed; see [integration-report.md](integration-report.md) for exact versions, scope and artifact binding.
 
 Paperless-ngx `v3.3.4`, the latest release checked on 2026-10-29, has the same native `mail.py` Git blob (`198a2b544b811137532f5256657741cee2f8bbd7`) as `v3.3.0`. Source identity is not a live compatibility claim for `3.3.4`.

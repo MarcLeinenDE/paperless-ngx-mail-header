@@ -27,7 +27,7 @@ This file contains repository-wide working rules for Codex and other coding agen
 ## Evidence and tests
 
 - Treat the installed local plugin `0.1.0` as a proven production reference. **Do not replace it automatically.**
-- Current source tree is `0.2.0`, selected by the maintainer as the first public repository version, **not released**. The runtime source comparison is recorded in `docs/source-comparison.md`.
+- Current source version is `0.2.0`, selected by the maintainer as the first public repository version. Release status is tracked on GitHub; real-stack synthetic evidence is in `docs/integration-report.md`. The runtime source comparison is recorded in `docs/source-comparison.md`.
 - Run offline tests before suggesting integration. Mark fake/mock-based tests honestly; passing unit tests does not establish end-to-end compatibility.
 - Test HTML documents with complex `<head>` and `<body>` attributes, fake markup inside comments/scripts, inline CIDs, missing fields, multiple recipients, escaping, and daylight-saving time.
 - Add a separate integration test checklist; never send or fetch real email without explicit user authorization.
