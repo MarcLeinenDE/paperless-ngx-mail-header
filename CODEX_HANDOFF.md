@@ -8,6 +8,8 @@ The maintainer authorized creation of the public repository `MarcLeinenDE/paperl
 
 Subsequent maintainer direction for `0.3.0`: make English the default inserted-header language, add German through `PAPERLESS_MAIL_HEADER_LANGUAGE=de`, and let contributors add further gettext localizations through catalog-only PRs. This explicitly replaces the original German-only output rule; native mail handling and production-deployment restrictions remain in place.
 
+Subsequent maintainer direction for `0.3.1`: use Paperless's effective `settings.TIME_ZONE` and fall back to UTC when unset, matching Paperless. Language remains independent of time zone. No separate plugin time-zone variable is requested.
+
 - Paperless-ngx: `3.3.0`; the production environment itself is outside this repository.
 - Consumer, Celery task worker and webserver load parser plugins.
 - Installed production plugin: `paperless-ngx-mail-header==0.1.0`; registry selected `Paperless-ngx Mail Header` for `message/rfc822`.

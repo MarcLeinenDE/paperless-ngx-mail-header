@@ -1,5 +1,13 @@
 # Changelog
 
+## [0.3.1] — 2026-10-29
+
+- Replace the hardcoded Europe/Berlin HTML-header time zone with the effective Paperless `settings.TIME_ZONE`, configured via `PAPERLESS_TIME_ZONE`.
+- Use UTC when the effective time zone is missing or empty, matching Paperless's unset default. Keep language and time zone independent; no additional plugin environment variable or runtime dependency is introduced.
+- Preserve Berlin output when Paperless uses Europe/Berlin. Document the changed behavior for installations using another zone or the UTC default; existing PDFs remain unchanged.
+- Add regression coverage for New York DST/date boundaries, fractional offsets, effective-setting precedence and UTC defaults; expand offline coverage to 78 tests.
+- Extend the shared-wheel real-stack release gate with configured New York and absent-time-zone/UTC scenarios, alongside every contributed language in Berlin.
+
 ## [0.3.0] — 2026-10-29
 
 - Change the inserted HTML header's default language to English: From, To, Date, Subject.

@@ -7,12 +7,12 @@ A lightweight, unofficial **Paperless-ngx 3** parser extension that adds an emai
 
 ![Anonymized example of the PDF email header](docs/images/mail-header-example.png)
 
-*Example generated from the actual header formatter with fictional addresses.*
+*Example generated from the actual header formatter with fictional addresses and a simulated Paperless time zone of Europe/Berlin.*
 
 ## Features
 
 - Inserts four rows: **From**, **To**, **Date** and **Subject** by default, with German available as the first translation.
-- Shows the email's timestamp in **Europe/Berlin**, including daylight-saving time.
+- Uses the **Paperless-configured time zone**, including daylight-saving time; defaults to UTC when no time zone is configured.
 - Escapes header values before inserting HTML.
 - Preserves the original HTML body without re-serializing it; native Paperless continues to render via Gotenberg.
 - Leaves plain-text-only messages on the existing Paperless text-rendering path (which already includes mail headers).
@@ -25,7 +25,7 @@ A lightweight, unofficial **Paperless-ngx 3** parser extension that adds an emai
 | --- | --- | --- |
 | Paperless-ngx `3.3.0` | **Real-stack verified with synthetic inputs** | `0.3.0`: English default and German setting, each with 13 successful documents per native/plugin instance plus matching invalid-sender rejection; [report](docs/integration-report-0.3.0.md) |
 | Paperless-ngx other 3.x releases | **Not verified** | Parser internals can change between versions |
-| Unit test suite | **Unit tested** | 58 offline tests; CI covers Python 3.12–3.14, with a separate real-stack matrix for every shipped language |
+| Unit test suite | **Unit tested** | 78 offline tests; CI covers Python 3.12–3.14, with a separate real-stack matrix for every shipped language plus New York and unset-time-zone scenarios |
 | Plain-text-only `.eml` | **Native fallback verified** | Real PDF text/page count match the native baseline |
 | HTML with PDF attachments | **Native delegation** | Real EML and separate PDF uploads verified; IMAP mail-rule extraction is outside the integration scope |
 
@@ -39,13 +39,23 @@ English is the default. To keep the previous German header when upgrading from `
 PAPERLESS_MAIL_HEADER_LANGUAGE=de
 ```
 
-German uses **Von**, **An**, **Datum**, **Betreff** and the previous `29.10.2026, 10:15 Uhr` date style. English uses **From**, **To**, **Date**, **Subject** and `2026-10-29, 10:15`. Both retain the existing Europe/Berlin time zone. Existing PDFs keep the language used when they were generated.
+German uses **Von**, **An**, **Datum**, **Betreff** and the previous `29.10.2026, 10:15 Uhr` date style. English uses **From**, **To**, **Date**, **Subject** and `2026-10-29, 10:15`. From `0.3.1`, the time zone follows Paperless independently of language. Existing PDFs keep their import-time language and timestamp.
 
 [View the German header example](docs/images/mail-header-example-de.png).
 
 The setting is independent of the browser's UI language and OCR language. See [configuration](docs/configuration.md#header-language) for Docker and service-based installations.
 
 New languages/localizations are welcome through PRs: add a complete gettext `.po` catalog and its compiled `.mo`. Catalog discovery and CI are automatic; no Python registry or workflow edit is needed. See [Contributing translations](docs/translations.md).
+
+## Header time zone
+
+From `0.3.1`, the plugin uses Paperless's effective `TIME_ZONE` setting, configured through `PAPERLESS_TIME_ZONE`. If unset, it uses UTC, matching Paperless. No separate plugin time-zone variable is needed.
+
+```ini
+PAPERLESS_TIME_ZONE=Europe/Berlin
+```
+
+**Upgrading from 0.3.0 or earlier:** the HTML header previously always used Europe/Berlin. Keep `PAPERLESS_TIME_ZONE=Europe/Berlin` in Paperless if you want to retain that timestamp behavior. Other configured time zones, such as `America/New_York`, now apply to the inserted header as well. See [time-zone configuration](docs/configuration.md#header-time-zone) and [0.3.1 validation](docs/integration-report-0.3.1.md).
 
 ## Installation
 
@@ -60,7 +70,7 @@ The extension is distributed as a Python wheel through this repository's [GitHub
 ### Installing the wheel
 
 1. Open the [latest stable release](https://github.com/MarcLeinenDE/paperless-ngx-mail-header/releases/latest).
-2. Download the wheel and `SHA256SUMS.txt` from the same release. For `v0.3.0`, the wheel is `paperless_ngx_mail_header-0.3.0-py3-none-any.whl`.
+2. Download the wheel and `SHA256SUMS.txt` from the same release. For `v0.3.1`, the wheel is `paperless_ngx_mail_header-0.3.1-py3-none-any.whl`.
 3. Verify the wheel's SHA-256 against its entry in `SHA256SUMS.txt`.
 4. Install the wheel with `--no-deps` in the **same Python environment used by Paperless**.
 5. Restart the Paperless processes that load the parser registry, including the consumer, workers and webserver as applicable, then verify parser selection below.
@@ -68,9 +78,9 @@ The extension is distributed as a Python wheel through this repository's [GitHub
 For a uv-based LXC installation using `/opt/paperless/.venv`, an example is:
 
 ```bash
-sha256sum paperless_ngx_mail_header-0.3.0-py3-none-any.whl
+sha256sum paperless_ngx_mail_header-0.3.1-py3-none-any.whl
 # Compare the complete hash with the wheel entry in SHA256SUMS.txt.
-uv pip install --python /opt/paperless/.venv/bin/python --no-deps ./paperless_ngx_mail_header-0.3.0-py3-none-any.whl
+uv pip install --python /opt/paperless/.venv/bin/python --no-deps ./paperless_ngx_mail_header-0.3.1-py3-none-any.whl
 ```
 
 Run this in the Paperless environment after transferring the wheel and checking the interpreter path. Docker deployments should install the wheel in a derived image so it survives container replacement. Back up before updating an existing installation and keep a rollback package available.

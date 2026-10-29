@@ -1,8 +1,8 @@
 # Testing and evidence
 
-From `0.3.0`, CI validates every `.po`/`.mo` catalog and builds a shared candidate wheel once. Its real-stack matrix automatically discovers English plus every contributed catalog. The English job leaves the plugin language unset; other jobs set `PAPERLESS_MAIL_HEADER_LANGUAGE` through a Compose override. Every language tests the exact same wheel. Historical `0.2.0` evidence below concerns the earlier German-only header.
+From `0.3.0`, CI validates every `.po`/`.mo` catalog and builds a shared candidate wheel once. Its real-stack matrix automatically discovers English plus every contributed catalog. The English job leaves the plugin language unset; other jobs set `PAPERLESS_MAIL_HEADER_LANGUAGE` through a Compose override. Every language tests the exact same wheel. From `0.3.1`, all catalog jobs explicitly configure Europe/Berlin in Paperless; two additional English jobs configure America/New_York or leave PAPERLESS_TIME_ZONE entirely absent to verify the actual Paperless UTC default. The workflow records and checks both the effective Django time zone and the presence/absence of that environment variable in each stack. Historical `0.2.0` evidence below concerns the earlier German-only header.
 
-See [the 0.3.0 i18n report](integration-report-0.3.0.md) for the completed English/German checks and [translation contribution guide](translations.md) for adding a catalog.
+See [the 0.3.0 i18n report](integration-report-0.3.0.md) for historical English/German results, [0.3.1 time-zone validation](integration-report-0.3.1.md) for the expanded release gate, and [the translation contribution guide](translations.md) for adding a catalog.
 
 ## Offline tests
 
@@ -23,7 +23,7 @@ The offline suite uses pure formatter tests plus a test double for the native Pa
 | HTML with external HTTPS image | Gotenberg policy determines fetch | Image visible, compare logs |
 | HTML + PDF attachment | Mail rule handles attachment separately | Expected number of documents, attachments byte comparison |
 | German text and escaped characters | No leaked markup or missing characters | Extracted PDF text and visual inspection |
-| Summer/winter time | Correct Berlin-local timestamp | Metadata check and PDF view |
+| Summer/winter time | Correct configured-zone timestamp; UTC when unset | Metadata check and PDF view |
 | EML without expected fields | No crash, reasonable missing-value display | Test fixture |
 
 ## Disposable real-stack integration

@@ -7,14 +7,12 @@ Paperless-ngx still runs its native HTML security handling and Gotenberg.
 from __future__ import annotations
 
 import re
-from datetime import datetime
+from datetime import UTC, datetime, tzinfo
 from html import escape
 from html.parser import HTMLParser
-from zoneinfo import ZoneInfo
 
 from .i18n import get_translation
 
-_TIMEZONE = ZoneInfo("Europe/Berlin")
 _DOCTYPE = re.compile(r"\A(\ufeff?\s*<!doctype\s+html\b[^>]*>)", re.I)
 
 
@@ -59,23 +57,23 @@ def _address_list(values: object) -> str:
     return ", ".join(getattr(a, "full", str(a)) for a in (values or []))
 
 
-def _date_text(value: datetime | None, gettext) -> str:
+def _date_text(value: datetime | None, gettext, timezone: tzinfo) -> str:
     if value is None:
         return "—"
     # The native Paperless parser makes dates timezone-aware before this is called.
     # For direct/standalone use, assume a naive date is in the target local time.
     if value.tzinfo is None:
-        value = value.replace(tzinfo=_TIMEZONE)
+        value = value.replace(tzinfo=timezone)
     try:
-        local = value.astimezone(_TIMEZONE)
+        local = value.astimezone(timezone)
     except OverflowError:
-        # A representable RFC822 date can exceed datetime's range in Berlin.
+        # A representable RFC822 date can exceed datetime's range after conversion.
         return "—"
     # Translators: Numeric strftime pattern. Keep %Y, %m, %d, %H and %M.
     return local.strftime(gettext("%Y-%m-%d, %H:%M"))
 
 
-def render_header(mail: object, *, language: str = "en") -> str:
+def render_header(mail: object, *, language: str = "en", timezone: tzinfo = UTC) -> str:
     """Produce four HTML-escaped rows with inline, isolated print styling."""
     translation = get_translation(language)
     gettext = translation.gettext
@@ -85,7 +83,7 @@ def render_header(mail: object, *, language: str = "en") -> str:
     sender = getattr(getattr(mail, "from_values", None), "full", "")
     recipient = _address_list(getattr(mail, "to_values", None))
     subject = getattr(mail, "subject", "")
-    date = _date_text(getattr(mail, "date", None), gettext)
+    date = _date_text(getattr(mail, "date", None), gettext, timezone)
 
     entries = (
         (gettext("From"), sender),

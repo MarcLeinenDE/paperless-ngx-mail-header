@@ -33,6 +33,10 @@ def parser_class(monkeypatch):
     packages['paperless'].__path__ = []
     packages['paperless.parsers'].__path__ = []
     packages['paperless.parsers.mail'].MailDocumentParser = NativeMailParser
+    packages['django'] = ModuleType('django')
+    packages['django'].__path__ = []
+    packages['django.conf'] = ModuleType('django.conf')
+    packages['django.conf'].settings = SimpleNamespace(TIME_ZONE='Europe/Berlin')
     for name, module in packages.items():
         monkeypatch.setitem(sys.modules, name, module)
     # Do not keep a cached plugin class with a different native class.
@@ -106,3 +110,28 @@ def test_worker_environment_selects_header_language(parser_class, monkeypatch, l
     result = parser_class().generate_pdf(message())
     assert '>' + expected + '<' in result[1]
     assert '>' + unexpected + '<' not in result[1]
+
+
+@pytest.mark.parametrize('language', ['en', 'de'])
+@pytest.mark.parametrize(('zone', 'english_date', 'german_date'), [
+    ('Europe/Berlin', '2026-10-29, 08:49', '29.10.2026, 08:49 Uhr'),
+    ('America/New_York', '2026-10-29, 03:49', '29.10.2026, 03:49 Uhr'),
+    ('Asia/Kathmandu', '2026-10-29, 13:34', '29.10.2026, 13:34 Uhr'),
+    ('UTC', '2026-10-29, 07:49', '29.10.2026, 07:49 Uhr'),
+    (None, '2026-10-29, 07:49', '29.10.2026, 07:49 Uhr'),
+    ('', '2026-10-29, 07:49', '29.10.2026, 07:49 Uhr'),
+])
+def test_effective_paperless_timezone_is_independent_of_language_and_raw_environment(
+    parser_class, monkeypatch, language, zone, english_date, german_date,
+):
+    monkeypatch.setenv('PAPERLESS_MAIL_HEADER_LANGUAGE', language)
+    # The initialized Django setting is authoritative, rather than a raw env lookup.
+    monkeypatch.setenv('PAPERLESS_TIME_ZONE', 'Pacific/Honolulu')
+    monkeypatch.setattr(sys.modules['django.conf'].settings, 'TIME_ZONE', zone)
+    html = parser_class().generate_pdf(message())[1]
+    assert (english_date if language == 'en' else german_date) in html
+
+
+def test_missing_paperless_timezone_defaults_to_utc(parser_class, monkeypatch):
+    monkeypatch.delattr(sys.modules['django.conf'].settings, 'TIME_ZONE')
+    assert '2026-10-29, 07:49' in parser_class().generate_pdf(message())[1]

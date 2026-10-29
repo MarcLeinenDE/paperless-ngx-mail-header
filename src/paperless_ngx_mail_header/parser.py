@@ -7,7 +7,9 @@ or changes to the e-mail rule settings.
 from __future__ import annotations
 
 import os
+from zoneinfo import ZoneInfo
 
+from django.conf import settings
 from paperless.parsers.mail import MailDocumentParser as NativeMailDocumentParser
 
 from .formatting import add_header_to_html, render_header
@@ -16,7 +18,7 @@ from .i18n import LANGUAGE_ENV
 
 class MailHeaderParser(NativeMailDocumentParser):
     name = "Paperless-ngx Mail Header"
-    version = "0.3.0"
+    version = "0.3.1"
     author = "Marc Leinen"
     url = "https://github.com/MarcLeinenDE/paperless-ngx-mail-header"
 
@@ -38,7 +40,11 @@ class MailHeaderParser(NativeMailDocumentParser):
     def generate_pdf_from_html(self, orig_html, attachments):
         message = getattr(self, "_header_mail_message", None)
         if message is not None:
-            header = render_header(message, language=os.environ.get(LANGUAGE_ENV, "en"))
+            # Use Paperless's effective configuration, including its UTC default.
+            timezone = ZoneInfo(getattr(settings, "TIME_ZONE", None) or "UTC")
+            header = render_header(
+                message, language=os.environ.get(LANGUAGE_ENV, "en"), timezone=timezone,
+            )
             orig_html = add_header_to_html(orig_html, header)
         # Native implementation still handles scripts, inline CID assets,
         # Gotenberg, page layout and PDF/A exactly as before.

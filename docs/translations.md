@@ -34,7 +34,7 @@ Labels must be single-line plain text without a trailing colon; the renderer add
 
 Retain all five numeric directives `%Y`, `%m`, `%d`, `%H` and `%M`, in the order suitable for the language. Literal separators and words can be localized. For example, German uses `%d.%m.%Y, %H:%M Uhr`.
 
-Only those directives and `%%` are accepted. Do not use `%b`, `%B`, `%a` or `%p`: those would depend on the worker machine's process locale instead of the selected catalog. The time zone remains Europe/Berlin for all languages.
+Only those directives and `%%` are accepted. Do not use `%b`, `%B`, `%a` or `%p`: those would depend on the worker machine's process locale instead of the selected catalog. The time zone follows Paperless configuration independently of the catalog, with UTC as the default; see [header time zone](configuration.md#header-time-zone).
 
 ### Layout direction
 

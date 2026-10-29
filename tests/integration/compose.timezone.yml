@@ -1,0 +1,7 @@
+services:
+  native:
+    environment:
+      PAPERLESS_TIME_ZONE: ${SMOKE_TIME_ZONE:?Select the Paperless timezone under test}
+  plugin:
+    environment:
+      PAPERLESS_TIME_ZONE: ${SMOKE_TIME_ZONE:?Select the Paperless timezone under test}
