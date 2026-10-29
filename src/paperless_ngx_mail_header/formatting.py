@@ -12,6 +12,8 @@ from html import escape
 from html.parser import HTMLParser
 from zoneinfo import ZoneInfo
 
+from .i18n import get_translation
+
 _TIMEZONE = ZoneInfo("Europe/Berlin")
 _DOCTYPE = re.compile(r"\A(\ufeff?\s*<!doctype\s+html\b[^>]*>)", re.I)
 
@@ -57,7 +59,7 @@ def _address_list(values: object) -> str:
     return ", ".join(getattr(a, "full", str(a)) for a in (values or []))
 
 
-def _date_text(value: datetime | None) -> str:
+def _date_text(value: datetime | None, gettext) -> str:
     if value is None:
         return "—"
     # The native Paperless parser makes dates timezone-aware before this is called.
@@ -69,30 +71,36 @@ def _date_text(value: datetime | None) -> str:
     except OverflowError:
         # A representable RFC822 date can exceed datetime's range in Berlin.
         return "—"
-    return local.strftime("%d.%m.%Y, %H:%M Uhr")
+    # Translators: Numeric strftime pattern. Keep %Y, %m, %d, %H and %M.
+    return local.strftime(gettext("%Y-%m-%d, %H:%M"))
 
 
-def render_header(mail: object) -> str:
+def render_header(mail: object, *, language: str = "en") -> str:
     """Produce four HTML-escaped rows with inline, isolated print styling."""
+    translation = get_translation(language)
+    gettext = translation.gettext
+    # Translators: Use exactly ltr or rtl for the header's writing direction.
+    direction = translation.pgettext("header layout direction", "ltr")
+    direction = "rtl" if direction == "rtl" else "ltr"
     sender = getattr(getattr(mail, "from_values", None), "full", "")
     recipient = _address_list(getattr(mail, "to_values", None))
     subject = getattr(mail, "subject", "")
-    date = _date_text(getattr(mail, "date", None))
+    date = _date_text(getattr(mail, "date", None), gettext)
 
     entries = (
-        ("Von", sender),
-        ("An", recipient),
-        ("Datum", date),
-        ("Betreff", subject),
+        (gettext("From"), sender),
+        (gettext("To"), recipient),
+        (gettext("Date"), date),
+        (gettext("Subject"), subject),
     )
     rows = "\n".join(
         '<tr style="vertical-align:top">'
-        '<th scope="row" style="width:78px;text-align:left;white-space:nowrap;'
+        '<th scope="row" style="width:78px;text-align:start;overflow-wrap:anywhere;'
         'padding:3px 12px 3px 0;font-size:12px;font-weight:600;color:#374151">'
-        f"{label}:</th>"
+        f"{escape(label, quote=True)}:</th>"
         '<td style="padding:3px 0;font-size:12px;color:#111827;'
         'overflow-wrap:anywhere;word-break:break-word">'
-        f"{_value(value)}</td></tr>"
+        f'<bdi dir="auto">{_value(value)}</bdi></td></tr>'
         for label, value in entries
     )
     return (
@@ -101,7 +109,8 @@ def render_header(mail: object) -> str:
         'margin:0 0 16px 0;padding:12px 14px;'
         'background:#f3f4f6;border:1px solid #d1d5db;border-radius:4px;'
         'color:#111827;font:12px/1.4 Arial,Helvetica,sans-serif;'
-        'text-align:left;direction:ltr;break-inside:avoid;page-break-inside:avoid">'
+        f'text-align:start;direction:{direction};break-inside:avoid;page-break-inside:avoid" '
+        f'dir="{direction}">'
         '<table role="presentation" style="width:100%;border-collapse:collapse;'
         'border-spacing:0;table-layout:fixed;font:inherit;color:inherit">'
         f"{rows}</table></div>"

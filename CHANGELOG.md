@@ -1,5 +1,14 @@
 # Changelog
 
+## [0.3.0] — 2026-10-29
+
+- Change the inserted HTML header's default language to English: From, To, Date, Subject.
+- Add `PAPERLESS_MAIL_HEADER_LANGUAGE`; set it to `de` to keep the previous German labels and date format when upgrading.
+- Introduce plugin-local gettext catalogs with German as the first translation. Contributors can add languages via `.po`/`.mo` files without editing a Python language registry or CI matrix.
+- Localize the numeric date format, retain Europe/Berlin independently of language, and prepare logical alignment/bidirectional value isolation for future RTL catalogs.
+- Validate complete translations, direction/date tokens, compiled catalog freshness and inclusion in wheel/sdist. Test the same candidate wheel in a real Paperless stack for every shipped catalog plus English.
+- Verify English/German real-stack imports and German visual compatibility with `0.2.0`; expand offline coverage to 58 cases and document translation-only contribution checks.
+
 ## [0.2.0] — 2026-10-29
 
 - Prepare public-repository structure, documentation and offline CI.

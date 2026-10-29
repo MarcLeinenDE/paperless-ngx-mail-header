@@ -1,6 +1,32 @@
 # Configuration and mail rules
 
-This extension deliberately has **no runtime configuration file**, no environment variable, and no new Paperless mail rule. The native parser controls ingestion exactly as before.
+The native parser controls ingestion and mail rules as before. Starting with `0.3.0`, one plugin environment variable selects the language of the inserted HTML header.
+
+## Header language
+
+`PAPERLESS_MAIL_HEADER_LANGUAGE` defaults to `en`. The available initial languages are:
+
+| Value | Header labels | Example date |
+| --- | --- | --- |
+| `en` or unset | From, To, Date, Subject | `2026-10-29, 10:15` |
+| `de` | Von, An, Datum, Betreff | `29.10.2026, 10:15 Uhr` |
+
+**Upgrading from 0.2.0:** set `PAPERLESS_MAIL_HEADER_LANGUAGE=de` to retain German labels and the previous date format. English is now the default. Both languages keep the existing Europe/Berlin time zone, including DST. The plugin does not change the Paperless server's global time zone.
+
+For Docker Compose, add the setting to the existing Paperless service environment (and separate worker services if used):
+
+```yaml
+environment:
+  PAPERLESS_MAIL_HEADER_LANGUAGE: de
+```
+
+For LXC or another service-based installation, supply `PAPERLESS_MAIL_HEADER_LANGUAGE=de` through the environment configuration of the actual Paperless consumer, workers and webserver. Restart those processes after changing it. Exporting the variable in an unrelated terminal does not change an already-running service.
+
+This is an installation-wide PDF output setting. The language of the browser interface, OCR and the original email does not select it automatically. A generated PDF keeps its language until explicitly regenerated; shared documents do not change language for each viewer.
+
+Codes are case-insensitive; `_` and `-` are accepted as region separators. `de-DE` falls back to the shipped `de` catalog. An unsupported or unreadable catalog falls back to English with a warning, so a language configuration error does not block email processing.
+
+Additional languages can be contributed as gettext catalogs through a PR; see [the translation guide](translations.md). No new runtime dependency or Paperless source modification is required.
 
 ## HTML-only mail rule
 

@@ -1,4 +1,4 @@
 FROM ghcr.io/paperless-ngx/paperless-ngx:3.3.0
-COPY dist/paperless_ngx_mail_header-0.2.0-py3-none-any.whl /tmp/
-RUN uv pip install --system --no-deps /tmp/paperless_ngx_mail_header-0.2.0-py3-none-any.whl \
-    && rm /tmp/paperless_ngx_mail_header-0.2.0-py3-none-any.whl
+COPY dist/*.whl /tmp/mail-header-wheels/
+RUN uv pip install --system --no-deps /tmp/mail-header-wheels/*.whl \
+    && rm /tmp/mail-header-wheels/*.whl

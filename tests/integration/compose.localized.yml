@@ -1,0 +1,4 @@
+services:
+  plugin:
+    environment:
+      PAPERLESS_MAIL_HEADER_LANGUAGE: ${SMOKE_LANGUAGE:?Select the locale under test}

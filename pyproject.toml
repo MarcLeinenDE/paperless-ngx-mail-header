@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "paperless-ngx-mail-header"
-version = "0.2.0"
+version = "0.3.0"
 description = "Minimal header overlay for Paperless-ngx email PDFs using the native parser"
 readme = "README.md"
 requires-python = ">=3.12"
@@ -22,7 +22,7 @@ classifiers = [
 ]
 
 [project.optional-dependencies]
-test = ["pytest>=8,<10", "imap-tools>=1.14,<1.16"]
+test = ["pytest>=8,<10", "imap-tools>=1.14,<1.16", "Babel==2.18.0"]
 
 [project.entry-points."paperless_ngx.parsers"]
 paperless_mail_header = "paperless_ngx_mail_header.parser:MailHeaderParser"
@@ -34,6 +34,9 @@ Issues = "https://github.com/MarcLeinenDE/paperless-ngx-mail-header/issues"
 
 [tool.setuptools.packages.find]
 where = ["src"]
+
+[tool.setuptools.package-data]
+paperless_ngx_mail_header = ["locale/*.pot", "locale/*/LC_MESSAGES/*.po", "locale/*/LC_MESSAGES/*.mo"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
