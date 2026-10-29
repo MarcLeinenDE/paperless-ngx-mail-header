@@ -6,14 +6,17 @@ or changes to the e-mail rule settings.
 
 from __future__ import annotations
 
+import os
+
 from paperless.parsers.mail import MailDocumentParser as NativeMailDocumentParser
 
 from .formatting import add_header_to_html, render_header
+from .i18n import LANGUAGE_ENV
 
 
 class MailHeaderParser(NativeMailDocumentParser):
     name = "Paperless-ngx Mail Header"
-    version = "0.2.0"
+    version = "0.3.0"
     author = "Marc Leinen"
     url = "https://github.com/MarcLeinenDE/paperless-ngx-mail-header"
 
@@ -35,7 +38,8 @@ class MailHeaderParser(NativeMailDocumentParser):
     def generate_pdf_from_html(self, orig_html, attachments):
         message = getattr(self, "_header_mail_message", None)
         if message is not None:
-            orig_html = add_header_to_html(orig_html, render_header(message))
+            header = render_header(message, language=os.environ.get(LANGUAGE_ENV, "en"))
+            orig_html = add_header_to_html(orig_html, header)
         # Native implementation still handles scripts, inline CID assets,
         # Gotenberg, page layout and PDF/A exactly as before.
         return super().generate_pdf_from_html(orig_html, attachments)

@@ -4,3 +4,4 @@ recursive-include LICENSES *.txt
 recursive-include docs *.md *.png
 recursive-include scripts *.py
 recursive-include tests *.py *.yml Dockerfile
+recursive-include src/paperless_ngx_mail_header/locale *.pot *.po *.mo

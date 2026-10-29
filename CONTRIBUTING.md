@@ -11,3 +11,7 @@ Thank you for improving this independent Paperless-ngx extension. Please keep ch
 7. Apply the license policy in [LICENSES.md](LICENSES.md) to contributions you have the right to license.
 
 PRs are welcome. This is a personal spare-time community project with no response-time commitment.
+
+## Translations
+
+New languages and improvements to existing translations are welcome as pull requests. Follow [docs/translations.md](docs/translations.md) to add a complete `.po` catalog and its compiled `.mo`. Language discovery, catalog validation, packaging checks and real-stack CI automatically include contributed catalogs; a translation-only PR does not require editing Python or workflow files.

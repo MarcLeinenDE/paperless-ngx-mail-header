@@ -12,6 +12,7 @@ import pytest
 
 @pytest.fixture
 def parser_class(monkeypatch):
+    monkeypatch.delenv('PAPERLESS_MAIL_HEADER_LANGUAGE', raising=False)
     class NativeMailParser:
         @classmethod
         def supported_mime_types(cls):
@@ -91,3 +92,17 @@ def test_no_context_leak_after_exception(parser_class):
     with pytest.raises(RuntimeError, match='native conversion failed'):
         parser.generate_pdf(message())
     assert parser._header_mail_message is None
+
+
+@pytest.mark.parametrize(('language', 'expected', 'unexpected'), [
+    (None, 'Subject:', 'Betreff:'),
+    ('de', 'Betreff:', 'Subject:'),
+    ('de-DE', 'Betreff:', 'Subject:'),
+    ('en', 'Subject:', 'Betreff:'),
+])
+def test_worker_environment_selects_header_language(parser_class, monkeypatch, language, expected, unexpected):
+    if language is not None:
+        monkeypatch.setenv('PAPERLESS_MAIL_HEADER_LANGUAGE', language)
+    result = parser_class().generate_pdf(message())
+    assert '>' + expected + '<' in result[1]
+    assert '>' + unexpected + '<' not in result[1]

@@ -11,7 +11,7 @@ A lightweight, unofficial **Paperless-ngx 3** parser extension that adds an emai
 
 ## Features
 
-- Inserts four localized rows: **Von**, **An**, **Datum** and **Betreff**.
+- Inserts four rows: **From**, **To**, **Date** and **Subject** by default, with German available as the first translation.
 - Shows the email's timestamp in **Europe/Berlin**, including daylight-saving time.
 - Escapes header values before inserting HTML.
 - Preserves the original HTML body without re-serializing it; native Paperless continues to render via Gotenberg.
@@ -29,7 +29,23 @@ A lightweight, unofficial **Paperless-ngx 3** parser extension that adds an emai
 | Plain-text-only `.eml` | **Native fallback verified** | Real PDF text/page count match the native baseline |
 | HTML with PDF attachments | **Native delegation** | Real EML and separate PDF uploads verified; IMAP mail-rule extraction is outside the integration scope |
 
-Current public release: [`v0.2.0`](https://github.com/MarcLeinenDE/paperless-ngx-mail-header/releases/tag/v0.2.0). See the [integration report](docs/integration-report.md) for exact versions and test scope, and the [changelog](CHANGELOG.md) for release history.
+Release downloads are available on [GitHub Releases](https://github.com/MarcLeinenDE/paperless-ngx-mail-header/releases). See the [integration report](docs/integration-report.md) for the `0.2.0` baseline and the [changelog](CHANGELOG.md) for release history. The language setting below requires `0.3.0` or later.
+
+## Header language
+
+English is the default. To keep the previous German header when upgrading from `0.2.0`, set this **in the environment of the Paperless services/containers**, then restart the consumer, workers and webserver as applicable:
+
+```ini
+PAPERLESS_MAIL_HEADER_LANGUAGE=de
+```
+
+German uses **Von**, **An**, **Datum**, **Betreff** and the previous `29.10.2026, 10:15 Uhr` date style. English uses **From**, **To**, **Date**, **Subject** and `2026-10-29, 10:15`. Both retain the existing Europe/Berlin time zone. Existing PDFs keep the language used when they were generated.
+
+[View the German header example](docs/images/mail-header-example-de.png).
+
+The setting is independent of the browser's UI language and OCR language. See [configuration](docs/configuration.md#header-language) for Docker and service-based installations.
+
+New languages/localizations are welcome through PRs: add a complete gettext `.po` catalog and its compiled `.mo`. Catalog discovery and CI are automatic; no Python registry or workflow edit is needed. See [Contributing translations](docs/translations.md).
 
 ## Installation
 
@@ -44,7 +60,7 @@ The extension is distributed as a Python wheel through this repository's [GitHub
 ### Installing the wheel
 
 1. Open the [latest stable release](https://github.com/MarcLeinenDE/paperless-ngx-mail-header/releases/latest).
-2. Download the wheel and `SHA256SUMS.txt` from the same release. For `v0.2.0`, the wheel is `paperless_ngx_mail_header-0.2.0-py3-none-any.whl`.
+2. Download the wheel and `SHA256SUMS.txt` from the same release. For `v0.3.0`, the wheel is `paperless_ngx_mail_header-0.3.0-py3-none-any.whl`.
 3. Verify the wheel's SHA-256 against its entry in `SHA256SUMS.txt`.
 4. Install the wheel with `--no-deps` in the **same Python environment used by Paperless**.
 5. Restart the Paperless processes that load the parser registry, including the consumer, workers and webserver as applicable, then verify parser selection below.
@@ -52,9 +68,9 @@ The extension is distributed as a Python wheel through this repository's [GitHub
 For a uv-based LXC installation using `/opt/paperless/.venv`, an example is:
 
 ```bash
-sha256sum paperless_ngx_mail_header-0.2.0-py3-none-any.whl
+sha256sum paperless_ngx_mail_header-0.3.0-py3-none-any.whl
 # Compare the complete hash with the wheel entry in SHA256SUMS.txt.
-uv pip install --python /opt/paperless/.venv/bin/python --no-deps ./paperless_ngx_mail_header-0.2.0-py3-none-any.whl
+uv pip install --python /opt/paperless/.venv/bin/python --no-deps ./paperless_ngx_mail_header-0.3.0-py3-none-any.whl
 ```
 
 Run this in the Paperless environment after transferring the wheel and checking the interpreter path. Docker deployments should install the wheel in a derived image so it survives container replacement. Back up before updating an existing installation and keep a rollback package available.
@@ -84,6 +100,7 @@ The plugin handles only `message/rfc822`; it does not replace PDF, raster-image 
 ```bash
 python -m pip install -e '.[test]'
 python -m pytest -q
+python scripts/check_translations.py
 python -m pip install build
 python -m build
 ```
@@ -108,7 +125,7 @@ Never commit real `.eml` messages, document scans, invoices, customer IDs or liv
 
 ## Contributing
 
-Contributions are welcome under the project's documented license policy. Keep the plugin intentionally small, write regression tests, and distinguish *unit tested* from *live verified*. Read [CONTRIBUTING.md](CONTRIBUTING.md) and [AGENTS.md](AGENTS.md).
+Contributions are welcome under the project's documented license policy, including [new translations](docs/translations.md). Keep the plugin intentionally small, write regression tests, and distinguish *unit tested* from *live verified*. Read [CONTRIBUTING.md](CONTRIBUTING.md) and [AGENTS.md](AGENTS.md).
 
 ## Licensing
 

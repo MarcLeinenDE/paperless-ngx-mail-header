@@ -38,10 +38,15 @@ def main() -> None:
         assert dict(entries['paperless_ngx.parsers']) == {
             'paperless_mail_header': 'paperless_ngx_mail_header.parser:MailHeaderParser'
         }
-        for filename in ('__init__.py', 'formatting.py', 'parser.py'):
+        for filename in ('__init__.py', 'formatting.py', 'parser.py', 'i18n.py'):
             assert wheel.read(f'paperless_ngx_mail_header/{filename}') == (
                 ROOT / 'src/paperless_ngx_mail_header' / filename
             ).read_bytes(), f'Wheel source mismatch: {filename}'
+        locale_root = ROOT / 'src/paperless_ngx_mail_header/locale'
+        for catalog in locale_root.rglob('*'):
+            if catalog.is_file() and catalog.suffix in ('.pot', '.po', '.mo'):
+                name = 'paperless_ngx_mail_header/locale/' + catalog.relative_to(locale_root).as_posix()
+                assert wheel.read(name) == catalog.read_bytes(), f'Wheel omits or changes {name}'
         for filename in ('LICENSE', 'LICENSES.md', 'THIRD_PARTY_NOTICES.md',
                          'LICENSES/CC-BY-SA-4.0.txt', 'LICENSES/GPL-3.0.txt'):
             assert any(name.endswith('/licenses/' + filename) for name in wheel.namelist())
@@ -51,8 +56,13 @@ def main() -> None:
         for filename in ('LICENSE', 'LICENSES.md', 'THIRD_PARTY_NOTICES.md',
                          'LICENSES/CC-BY-SA-4.0.txt', 'docs/release-checklist.md',
                          'docs/testing.md', 'docs/images/mail-header-example.png',
-                         'scripts/verify_distributions.py', 'tests/test_edge_cases.py'):
+                         'scripts/verify_distributions.py', 'scripts/check_translations.py',
+                         'tests/test_edge_cases.py', 'docs/translations.md',
+                         'src/paperless_ngx_mail_header/locale/mail_header.pot'):
             assert prefix + filename in source.getnames(), f'Sdist omits {filename}'
+        for catalog in locale_root.rglob('*'):
+            if catalog.is_file() and catalog.suffix in ('.po', '.mo'):
+                assert prefix + catalog.relative_to(ROOT).as_posix() in source.getnames()
 
     checksums = ''.join(
         f'{hashlib.sha256(path.read_bytes()).hexdigest()}  {path.name}\n'

@@ -7,12 +7,18 @@ Only loopback endpoints of the CI Compose environment are contacted.
 from __future__ import annotations
 
 import argparse
+import gettext
 import hashlib
 import json
 import os
 import struct
 import time
 import zlib
+import zipfile
+from email.parser import BytesParser
+from email.utils import parsedate_to_datetime
+from io import BytesIO
+from zoneinfo import ZoneInfo
 from email import policy
 from email.message import EmailMessage
 from pathlib import Path
@@ -94,6 +100,7 @@ def prepare() -> None:
         (WORK / f'fixtures/{name}.eml').write_bytes(message.as_bytes())
         manifest.append({'name': name, 'file': f'{name}.eml', 'marker': marker,
                          'date': date[1] if date else '29.10.2026, 10:15 Uhr',
+                         'rfc822_date': message['Date'],
                          'expect_rejection': name == 'missing_from'})
     manifest.append({'name': 'attachment_pdf', 'file': 'attachment.pdf',
                      'marker': 'SMOKE_PDF_ATTACHMENT_2026'})
@@ -177,6 +184,19 @@ def run() -> None:
     cases = json.loads((WORK / 'fixtures.json').read_text())
     accepted = [case for case in cases if not case.get('expect_rejection')]
     observed = {}
+    language = os.environ.get('SMOKE_LANGUAGE', 'en')
+    wheel, = (ROOT / 'dist').glob('*.whl')
+    translation = gettext.NullTranslations()
+    with zipfile.ZipFile(wheel) as package:
+        metadata_path, = [name for name in package.namelist() if name.endswith('.dist-info/METADATA')]
+        plugin_version = BytesParser().parsebytes(package.read(metadata_path))['Version']
+        if language != 'en':
+            path, = [name for name in package.namelist() if name.endswith('/LC_MESSAGES/mail_header.mo')
+                     and name.split('/')[-3].replace('_', '-').lower() == language]
+            translation = gettext.GNUTranslations(BytesIO(package.read(path)))
+    labels = [translation.gettext(label) + ':' for label in ('From', 'To', 'Date', 'Subject')]
+    if language == 'de':
+        assert labels == ['Von:', 'An:', 'Datum:', 'Betreff:']
     for kind, port in [('native', 8000), ('plugin', 8001)]:
         session, base = api(port)
         docs = import_files(session, base, cases)
@@ -198,10 +218,14 @@ def run() -> None:
                 if name in ('cid', 'external'):
                     assert image_count > 0, f'{kind}/{name}: image missing from PDF'
                 if kind == 'plugin' and name not in ('text', 'attachment_pdf'):
-                    for label in ('Von:', 'An:', 'Datum:', 'Betreff:'):
+                    for label in labels:
                         assert text.count(label) == 1, f'{name}: missing or duplicate {label}'
-                    assert case['date'] in text, f'{name}: incorrect Berlin timestamp'
-                    header_y = rendered[0].search_for('Von:')[0].y0
+                    date = parsedate_to_datetime(case['rfc822_date']).astimezone(ZoneInfo('Europe/Berlin'))
+                    date_text = date.strftime(translation.gettext('%Y-%m-%d, %H:%M'))
+                    if language == 'de':
+                        assert date_text == case['date'], 'German legacy date style changed'
+                    assert date_text in text, f'{name}: incorrect localized Berlin timestamp'
+                    header_y = rendered[0].search_for(labels[0])[0].y0
                     body_y = rendered[0].search_for(case['marker'])[0].y0
                     assert header_y < body_y, f'{name}: header is below body'
                     if name == 'unicode':
@@ -225,11 +249,11 @@ def run() -> None:
     versions = {kind: version(kind) for kind in ('native', 'plugin')}
     assert versions['native']['parser'] == 'Paperless-ngx Mail Parser'
     assert versions['plugin']['parser'] == 'Paperless-ngx Mail Header'
-    assert versions['plugin']['parser_version'] == '0.2.0'
-    wheel, = (ROOT / 'dist').glob('*.whl')
+    assert versions['plugin']['parser_version'] == plugin_version
     report = {'status': 'PASS', 'commit': os.environ.get('GITHUB_SHA', 'local'),
               'workflow_run': os.environ.get('GITHUB_RUN_ID', 'local'),
               'wheel_sha256': sha(wheel.read_bytes()), 'versions': versions,
+              'header_language': language,
               'dependencies': {'gotenberg': '8.37', 'tika_image': '3.3.1.0', 'broker_image': 'valkey:9-alpine'},
               'documents_per_stack': len(accepted), 'results': observed,
               'expected_rejections_per_stack': {'missing_from.eml': "Missing 'from'"},

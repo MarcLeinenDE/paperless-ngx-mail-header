@@ -43,7 +43,7 @@ def test_date_overflow_is_a_missing_value_instead_of_failing_conversion():
     (datetime(2026, 1, 2, 3, 4), "02.01.2026, 03:04 Uhr"),
 ])
 def test_dst_boundaries_and_standalone_naive_date(date, expected):
-    assert expected in render_header(SimpleNamespace(date=date))
+    assert expected in render_header(SimpleNamespace(date=date), language='de')
 
 
 @pytest.mark.parametrize("charset", ["utf-8", "iso-8859-1"])
@@ -56,7 +56,7 @@ def test_real_rfc822_decoding_of_addresses_subject_and_body(charset):
     message.set_content('<html><body>Grüße aus Köln &amp; Bonn</body></html>',
                         subtype='html', charset=charset)
     parsed = MailMessage.from_bytes(message.as_bytes())
-    header = render_header(parsed)
+    header = render_header(parsed, language='de')
     # Address decoding belongs to imap-tools, just as it does in Paperless.
     # Check that the formatter preserves the parsed value without reparsing it.
     assert escape(parsed.from_values.full, quote=True) in header

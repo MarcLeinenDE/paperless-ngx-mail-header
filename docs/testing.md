@@ -1,5 +1,7 @@
 # Testing and evidence
 
+From `0.3.0`, CI validates every `.po`/`.mo` catalog and builds a shared candidate wheel once. Its real-stack matrix automatically discovers English plus every contributed catalog. The English job leaves the plugin language unset; other jobs set `PAPERLESS_MAIL_HEADER_LANGUAGE` through a Compose override. Every language tests the exact same wheel. Historical `0.2.0` evidence below concerns the earlier German-only header.
+
 ## Offline tests
 
 ```bash

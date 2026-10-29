@@ -17,10 +17,12 @@ The built wheel is produced under `dist/`. Exact filename depends on version.
 
 ## GitHub release files
 
+**Upgrading to 0.3.0:** English is now the default header language. Set `PAPERLESS_MAIL_HEADER_LANGUAGE=de` in the Paperless process/container environment before restarting if you want to retain German output. See [header language configuration](configuration.md#header-language).
+
 Download the wheel and `SHA256SUMS.txt` from the same [GitHub release](https://github.com/MarcLeinenDE/paperless-ngx-mail-header/releases). Verify the wheel's hash before transferring it to the Paperless environment:
 
 ```bash
-sha256sum paperless_ngx_mail_header-0.2.0-py3-none-any.whl
+sha256sum paperless_ngx_mail_header-0.3.0-py3-none-any.whl
 # Compare the complete hash with the wheel entry in SHA256SUMS.txt.
 ```
 
@@ -51,9 +53,9 @@ Build a derived image so installation survives container replacement. For the of
 
 ```dockerfile
 FROM ghcr.io/paperless-ngx/paperless-ngx:3.3.0
-COPY paperless_ngx_mail_header-0.2.0-py3-none-any.whl /tmp/
-RUN uv pip install --system --no-deps /tmp/paperless_ngx_mail_header-0.2.0-py3-none-any.whl \
-    && rm /tmp/paperless_ngx_mail_header-0.2.0-py3-none-any.whl
+COPY paperless_ngx_mail_header-0.3.0-py3-none-any.whl /tmp/
+RUN uv pip install --system --no-deps /tmp/paperless_ngx_mail_header-0.3.0-py3-none-any.whl \
+    && rm /tmp/paperless_ngx_mail_header-0.3.0-py3-none-any.whl
 ```
 
 Use the derived image in the services that run the Paperless webserver, consumer and workers. Keep existing volumes, environment variables and mail rules. Rebuild and recreate those services, then verify parser selection as described above. Custom images may use a virtual environment instead; install into their actual interpreter.

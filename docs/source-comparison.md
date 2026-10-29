@@ -1,5 +1,7 @@
 # Production source comparison and release changes
 
+This is the historical source comparison for `0.2.0`. Starting with `0.3.0`, plugin-local gettext catalogs and configurable header language are additional intentional changes; see [the changelog](../CHANGELOG.md) and [translation guide](translations.md).
+
 The initial import was compared on 2026-10-29 with the wheel from the maintainer-supplied private `0.1.0` ZIP. The table and byte hashes below describe that initial import before the subsequent release-readiness fixes recorded at the end of this document.
 
 The maintainer selected `0.2.0` as the first public repository version provided that its runtime code matches production. The comparison confirms that condition.
