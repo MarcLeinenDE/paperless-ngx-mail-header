@@ -3,11 +3,11 @@
 A lightweight, unofficial **Paperless-ngx 3** parser extension that adds an email's **sender, recipient, date and subject** above its existing HTML content in the generated PDF. Everything else stays with Paperless-ngx's native mail parser.
 
 > [!IMPORTANT]
-> This is an independent community extension, **not affiliated with, endorsed by, or officially supported by Paperless-ngx**. Version `0.2.0` is the initial public repository version, validated with synthetic messages in a real disposable Paperless-ngx `3.3.0` stack. See the [integration report](docs/integration-report.md). It is based on the maintainer's production `0.1.0`, with two targeted formatter corrections for mixed line separators and date overflow. The native-parser wrapper differs only in version, author and project URL. The new package itself has not been deployed to that production environment.
+> This is an independent community extension. It is not affiliated with, endorsed by, or officially supported by Paperless-ngx.
 
 ![Anonymized example of the PDF email header](docs/images/mail-header-example.png)
 
-*Illustration generated from the actual header formatter with fictional addresses. It is not a screenshot of a personal email.*
+*Example generated from the actual header formatter with fictional addresses.*
 
 ## Features
 
@@ -24,27 +24,51 @@ A lightweight, unofficial **Paperless-ngx 3** parser extension that adds an emai
 | Component | State | Evidence |
 | --- | --- | --- |
 | Paperless-ngx `3.3.0` | **Real-stack verified with synthetic inputs** | `0.2.0`: 13 successful documents per native/plugin instance plus matching invalid-sender rejection; [report](docs/integration-report.md) |
-| Maintainer production reference | **HTML header reported working** | Local `0.1.0` on `3.3.0`; production was not modified for this release |
 | Paperless-ngx other 3.x releases | **Not verified** | Parser internals can change between versions |
 | Unit test suite | **Unit tested** | 40 tests pass in CI on Python 3.12–3.14; unit tests use a native-parser double, with a separate real-stack integration workflow |
 | Plain-text-only `.eml` | **Native fallback verified** | Real PDF text/page count match the native baseline |
 | HTML with PDF attachments | **Native delegation** | Real EML and separate PDF uploads verified; IMAP mail-rule extraction is outside the integration scope |
 
-Repository version: `0.2.0`. See [the source comparison](docs/source-comparison.md) for the evidence connecting it to the production `0.1.0` package. Real-stack evidence and its scope are recorded in the integration report.
-
-Release gates and publication procedures are tracked in the [release checklist](docs/release-checklist.md).
+Current public release: [`v0.2.0`](https://github.com/MarcLeinenDE/paperless-ngx-mail-header/releases/tag/v0.2.0). See the [integration report](docs/integration-report.md) for exact versions and test scope, and the [changelog](CHANGELOG.md) for release history.
 
 ## Installation
 
-Install the **built wheel** in the *same Python environment* used by Paperless and restart the processes that load the parser registry. **Do not modify mail rules just to activate the plugin.** See:
+The extension is distributed as a Python wheel through this repository's [GitHub Releases](https://github.com/MarcLeinenDE/paperless-ngx-mail-header/releases).
+
+### Requirements
+
+- Paperless-ngx with parser-plugin support; verified on `3.3.0`.
+- Python `3.12` or later in the environment running Paperless.
+- A working native Paperless email-conversion setup with Gotenberg and Tika.
+
+### Installing the wheel
+
+1. Open the [latest stable release](https://github.com/MarcLeinenDE/paperless-ngx-mail-header/releases/latest).
+2. Download the wheel and `SHA256SUMS.txt` from the same release. For `v0.2.0`, the wheel is `paperless_ngx_mail_header-0.2.0-py3-none-any.whl`.
+3. Verify the wheel's SHA-256 against its entry in `SHA256SUMS.txt`.
+4. Install the wheel with `--no-deps` in the **same Python environment used by Paperless**.
+5. Restart the Paperless processes that load the parser registry, including the consumer, workers and webserver as applicable, then verify parser selection below.
+
+For a uv-based LXC installation using `/opt/paperless/.venv`, an example is:
+
+```bash
+sha256sum paperless_ngx_mail_header-0.2.0-py3-none-any.whl
+# Compare the complete hash with the wheel entry in SHA256SUMS.txt.
+uv pip install --python /opt/paperless/.venv/bin/python --no-deps ./paperless_ngx_mail_header-0.2.0-py3-none-any.whl
+```
+
+Run this in the Paperless environment after transferring the wheel and checking the interpreter path. Docker deployments should install the wheel in a derived image so it survives container replacement. Back up before updating an existing installation and keep a rollback package available.
+
+**Do not modify mail rules just to activate the plugin.** Installation affects future parsing; existing PDFs are not automatically regenerated.
+
+Detailed instructions:
 
 - [Installation — LXC / community-scripts and Docker](docs/installation.md)
 - [Configuration and HTML layout](docs/configuration.md)
-- [Troubleshooting and rollback](docs/troubleshooting.md)
+- [Updates and rollback](docs/installation.md#updates)
+- [Troubleshooting](docs/troubleshooting.md)
 
-For a known community-scripts LXC layout, the package is installed in `/opt/paperless/.venv`; the reference instructions use `uv pip install --python ... --no-deps`.
-
-## Quick check
+### Verify the installation
 
 After installing in the correct Python environment, Paperless should log something like:
 
@@ -69,13 +93,11 @@ Tests use test doubles instead of a live Paperless installation. A separate real
 ## Project layout
 
 ```text
-src/paperless_ngx_mail_header/   Plugin entry point and isolated HTML formatter
-tests/                           Offline regression tests
-docs/                            Installation, configuration, privacy and compatibility
-scripts/                         Deterministic anonymized example-image generator
-.github/workflows/               Offline test and package-build CI
-AGENTS.md                         Coding-agent constraints and release gates
-CODEX_HANDOFF.md                  Requested work and acceptance criteria
+src/paperless_ngx_mail_header/  Plugin entry point and HTML formatter
+tests/                         Offline regression and real-stack integration tests
+docs/                          Installation, configuration, privacy and test evidence
+scripts/                       Package validation and synthetic-example generation
+.github/workflows/             Test, package-build and real-stack integration CI
 ```
 
 ## Privacy and security
@@ -98,8 +120,18 @@ Contributions are welcome under the project's documented license policy. Keep th
 
 Provided **AS IS**, without warranty. This plugin depends on Paperless internals and may need updates for future releases. It does not replace secure email handling or document-integrity controls. Product names and trademarks belong to their respective owners.
 
+## Project background and maintainer availability
+
+This project started as a private spare-time extension for my own Paperless installation. I wanted sender, recipient, date and subject to remain visible above the HTML content of archived emails while keeping Paperless's existing mail-processing paths. I decided to publish the resulting work so that other users can benefit from it instead of having to repeat the same work from scratch.
+
+Issues, corrections and pull requests are welcome. This is not a commercial project and there is no support or response-time commitment. I have a young child and limited spare time, so reviews and replies may sometimes take a while. Community contributions are nevertheless very welcome.
+
+Copyright © 2026 Marc Leinen and contributors.
+
 ---
 
 ### ☕ Like this project?
 
-If this project helped you, [buy me a coffee via PayPal](https://www.paypal.me/ccaa/) if you wish. No obligation — a ⭐, useful issue, or contribution is equally appreciated. See [SUPPORT.md](SUPPORT.md).
+If this work saved you some time or a few developer nerves, you can [buy me a coffee via PayPal](https://www.paypal.me/ccaa/). ☕😄
+
+No obligation — a ⭐, useful issue, or contribution is equally appreciated. See [SUPPORT.md](SUPPORT.md) for details.
