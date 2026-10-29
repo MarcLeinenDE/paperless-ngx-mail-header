@@ -4,6 +4,8 @@ English is the source language and default output. German is the first shipped t
 
 The plugin uses its own `mail_header` gettext domain so translations are independent of the language selected in the Paperless web interface. Python's standard library reads compiled catalogs at runtime. Babel is a development-only tool.
 
+The test extra pins the catalog compiler version so `.mo` output remains reproducible in contributor environments and CI.
+
 ## Add a catalog
 
 From a virtual environment in a repository checkout:
@@ -61,7 +63,9 @@ Generated PDFs keep the language chosen at import time. Changing the setting doe
 When a source message is intentionally changed, maintainers can extract and update the catalogs:
 
 ```bash
-pybabel extract --no-location --copyright-holder 'Marc Leinen and contributors' \
+pybabel extract --no-location --add-comments=Translators: \
+  --msgid-bugs-address https://github.com/MarcLeinenDE/paperless-ngx-mail-header/issues \
+  --copyright-holder 'Marc Leinen and contributors' \
   --project paperless-ngx-mail-header \
   -o src/paperless_ngx_mail_header/locale/mail_header.pot src/paperless_ngx_mail_header
 pybabel update -i src/paperless_ngx_mail_header/locale/mail_header.pot \

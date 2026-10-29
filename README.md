@@ -23,13 +23,13 @@ A lightweight, unofficial **Paperless-ngx 3** parser extension that adds an emai
 
 | Component | State | Evidence |
 | --- | --- | --- |
-| Paperless-ngx `3.3.0` | **Real-stack verified with synthetic inputs** | `0.2.0`: 13 successful documents per native/plugin instance plus matching invalid-sender rejection; [report](docs/integration-report.md) |
+| Paperless-ngx `3.3.0` | **Real-stack verified with synthetic inputs** | `0.3.0`: English default and German setting, each with 13 successful documents per native/plugin instance plus matching invalid-sender rejection; [report](docs/integration-report-0.3.0.md) |
 | Paperless-ngx other 3.x releases | **Not verified** | Parser internals can change between versions |
-| Unit test suite | **Unit tested** | 40 tests pass in CI on Python 3.12–3.14; unit tests use a native-parser double, with a separate real-stack integration workflow |
+| Unit test suite | **Unit tested** | 58 offline tests; CI covers Python 3.12–3.14, with a separate real-stack matrix for every shipped language |
 | Plain-text-only `.eml` | **Native fallback verified** | Real PDF text/page count match the native baseline |
 | HTML with PDF attachments | **Native delegation** | Real EML and separate PDF uploads verified; IMAP mail-rule extraction is outside the integration scope |
 
-Release downloads are available on [GitHub Releases](https://github.com/MarcLeinenDE/paperless-ngx-mail-header/releases). See the [integration report](docs/integration-report.md) for the `0.2.0` baseline and the [changelog](CHANGELOG.md) for release history. The language setting below requires `0.3.0` or later.
+Release downloads are available on [GitHub Releases](https://github.com/MarcLeinenDE/paperless-ngx-mail-header/releases). See the [i18n integration report](docs/integration-report-0.3.0.md) for exact versions and scope, and the [changelog](CHANGELOG.md) for release history. The language setting below requires `0.3.0` or later.
 
 ## Header language
 

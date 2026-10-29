@@ -8,8 +8,9 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: paperless-ngx-mail-header 0.3.0\n"
-"Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2026-10-29 14:25+0100\n"
+"Report-Msgid-Bugs-To: https://github.com/MarcLeinenDE/paperless-ngx-mail-"
+"header/issues\n"
+"POT-Creation-Date: 2026-10-29 14:44+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -18,10 +19,12 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Babel 2.18.0\n"
 
+#. Translators: Numeric strftime pattern. Keep %Y, %m, %d, %H and %M.
 #, python-format
 msgid "%Y-%m-%d, %H:%M"
 msgstr ""
 
+#. Translators: Use exactly ltr or rtl for the header's writing direction.
 msgctxt "header layout direction"
 msgid "ltr"
 msgstr ""
