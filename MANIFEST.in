@@ -1,5 +1,6 @@
 include CHANGELOG.md CONTRIBUTING.md SECURITY.md SUPPORT.md
 include LICENSES.md THIRD_PARTY_NOTICES.md
+include .github/workflows/integration.yml
 recursive-include LICENSES *.txt
 recursive-include docs *.md *.png
 recursive-include scripts *.py
