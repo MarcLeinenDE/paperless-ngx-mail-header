@@ -16,13 +16,20 @@ concurrency:
 jobs:
   candidate:
     runs-on: ubuntu-latest
+    timeout-minutes: 10
     outputs:
       matrix: ${{ steps.locales.outputs.matrix }}
+      integration_required: ${{ steps.changes.outputs.integration_required }}
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 2
       - uses: actions/setup-python@6d4fd22b20465ccc0f7354476588e8df7c9ca0e0 # v7.1.0
         with:
           python-version: "3.12"
+      - id: changes
+        name: Classify changes conservatively
+        run: python scripts/ci_changes.py
       - name: Build and check one shared candidate wheel
         run: |
           python -m pip install -e '.[test]' build
@@ -57,6 +64,7 @@ jobs:
   integration:
     name: integration (${{ matrix.scenario }})
     needs: candidate
+    if: needs.candidate.outputs.integration_required == 'true'
     runs-on: ubuntu-latest
     timeout-minutes: 25
     strategy:
@@ -122,11 +130,17 @@ jobs:
     if: ${{ always() }}
     needs: [candidate, integration]
     runs-on: ubuntu-latest
+    timeout-minutes: 5
     steps:
-      - name: Require the shared candidate and every integration scenario to pass
+      - name: Require the candidate and enforce the integration policy
         env:
           CANDIDATE_BUILD_RESULT: ${{ needs.candidate.result }}
           PAPERLESS_MATRIX_RESULT: ${{ needs.integration.result }}
+          INTEGRATION_REQUIRED: ${{ needs.candidate.outputs.integration_required }}
         run: |
           test "$CANDIDATE_BUILD_RESULT" = success
-          test "$PAPERLESS_MATRIX_RESULT" = success
+          case "$INTEGRATION_REQUIRED" in
+            true) test "$PAPERLESS_MATRIX_RESULT" = success ;;
+            false) test "$PAPERLESS_MATRIX_RESULT" = skipped ;;
+            *) echo 'Missing or invalid integration policy'; exit 1 ;;
+          esac

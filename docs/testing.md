@@ -58,6 +58,14 @@ Changes to `main` require a pull request, an up-to-date branch and resolved revi
 Two checks from the GitHub Actions app are required before merge:
 
 - `Unit and package checks` succeeds only when every Python test/build/package matrix job succeeds.
-- `Paperless integration checks` succeeds only when the shared wheel build and every dynamically discovered language/time-zone integration job succeed.
+- `Paperless integration checks` requires the shared wheel build and every dynamically discovered language/time-zone integration job to succeed, except for the explicitly classified documentation-only case below.
 
-These stable check names let contributors add catalogs without updating branch protection. A failed, cancelled or skipped prerequisite does not satisfy the corresponding check. Do not use CI-skip commit messages, including for documentation-only PRs: skipping a required workflow leaves the PR blocked. Successful checks do not replace the separate release gates above.
+These stable check names let contributors add catalogs without updating branch protection. A failed or cancelled prerequisite never satisfies its check. Do not use CI-skip commit messages, including for documentation-only PRs: skipping a required workflow leaves the PR blocked. Successful checks do not replace the separate release gates above.
+
+## Avoiding redundant CI work
+
+Both workflows run for pull requests, pushes to `main` and manual starts. Development-branch pushes and release tags do not duplicate the pull-request or final-main checks. New commits cancel superseded pull-request unit/package runs; integration already cancels superseded runs for its branch. Unit tests and the candidate build have ten-minute limits; the required checks have five-minute limits. Container jobs retain their 25-minute limit.
+
+The integration candidate always builds and verifies the package and discovers the complete language/time-zone matrix. `scripts/ci_changes.py` compares the PR base/head or push before/after commits. Only changes exclusively to regular UTF-8 Markdown files under `docs/` or the explicit root-document allowlist can omit the container matrix. Unknown files, code, catalogs, dependencies, workflows, binary/executable/symlink documents, missing history, empty comparisons and classification errors require the full matrix. Manual starts always run the full matrix, including for documentation-only release candidates.
+
+The required integration check always runs. It accepts a skipped matrix only after a successful candidate job explicitly reports that integration is unnecessary; a missing/invalid decision, an unexpected skip, a failure or a cancellation blocks merging. Unit tests and all package checks still run for documentation changes. No top-level path filter or elevated token permission is needed. Before publishing, run the full matrix on the final release commit as required by the [release checklist](release-checklist.md).

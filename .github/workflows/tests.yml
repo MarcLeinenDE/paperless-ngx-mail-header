@@ -2,15 +2,21 @@ name: Tests and package build
 
 on:
   push:
+    branches: [main]
   pull_request:
   workflow_dispatch:
 
 permissions:
   contents: read
 
+concurrency:
+  group: unit-package-${{ github.event_name }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
 jobs:
   tests:
     runs-on: ubuntu-latest
+    timeout-minutes: 10
     strategy:
       fail-fast: false
       matrix:
@@ -43,6 +49,7 @@ jobs:
     if: ${{ always() }}
     needs: tests
     runs-on: ubuntu-latest
+    timeout-minutes: 5
     steps:
       - name: Require every Python version to pass
         env:
