@@ -1,0 +1,40 @@
+name: Translation or localization
+description: Suggest a new language or improve an existing translation.
+title: "[Translation]: "
+labels: [translation]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        New languages and corrections are welcome. See [Contributing translations](https://github.com/MarcLeinenDE/paperless-ngx-mail-header/blob/main/docs/translations.md) for the catalog and validation workflow.
+        Use synthetic examples for date-format or layout issues.
+  - type: input
+    id: locale
+    attributes:
+      label: Language and locale code
+      placeholder: "French (fr), Portuguese (pt_BR), German (de)"
+    validations:
+      required: true
+  - type: dropdown
+    id: kind
+    attributes:
+      label: Type of contribution
+      options:
+        - New locale
+        - Correction to an existing translation
+        - Date-format or layout issue
+    validations:
+      required: true
+  - type: textarea
+    id: details
+    attributes:
+      label: Proposed translation or correction
+      description: Describe the requested change and, if applicable, the current and expected wording or format.
+    validations:
+      required: true
+  - type: checkboxes
+    id: contribution
+    attributes:
+      label: Pull request
+      options:
+        - label: I would like to contribute a catalog or correction through a pull request.

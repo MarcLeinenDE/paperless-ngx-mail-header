@@ -1,0 +1,8 @@
+blank_issues_enabled: true
+contact_links:
+  - name: Report a security vulnerability privately
+    url: https://github.com/MarcLeinenDE/paperless-ngx-mail-header/security/advisories/new
+    about: Use the private reporting form for security issues.
+  - name: Installation and configuration
+    url: https://github.com/MarcLeinenDE/paperless-ngx-mail-header/blob/main/docs/installation.md
+    about: Check the installation guide and configuration links before reporting a setup problem.

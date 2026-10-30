@@ -1,0 +1,71 @@
+name: Bug report
+description: Report a reproducible problem with the mail header.
+title: "[Bug]: "
+labels: [bug]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for helping improve the plugin. Use synthetic examples and remove personal information from diagnostics. Do not attach real emails, document contents, credentials or private URLs.
+        Report security vulnerabilities [privately](https://github.com/MarcLeinenDE/paperless-ngx-mail-header/security/advisories/new).
+  - type: input
+    id: plugin-version
+    attributes:
+      label: Plugin version
+      placeholder: "0.3.1"
+    validations:
+      required: true
+  - type: input
+    id: paperless-version
+    attributes:
+      label: Paperless-ngx version
+      placeholder: "3.3.0"
+    validations:
+      required: true
+  - type: dropdown
+    id: installation
+    attributes:
+      label: Installation type
+      options:
+        - Docker
+        - Native / LXC
+        - Other
+    validations:
+      required: true
+  - type: input
+    id: language
+    attributes:
+      label: Header language
+      description: Value of PAPERLESS_MAIL_HEADER_LANGUAGE, or unset.
+      placeholder: "en, de, or unset"
+  - type: input
+    id: time-zone
+    attributes:
+      label: Paperless time zone
+      description: Value of PAPERLESS_TIME_ZONE, or unset.
+      placeholder: "UTC, Europe/Berlin, or unset"
+  - type: textarea
+    id: reproduction
+    attributes:
+      label: Steps to reproduce
+      description: Describe the steps and whether the message is HTML or plain text. Any sample must be fully synthetic.
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected behavior
+    validations:
+      required: true
+  - type: textarea
+    id: actual
+    attributes:
+      label: Actual behavior
+    validations:
+      required: true
+  - type: textarea
+    id: diagnostics
+    attributes:
+      label: Anonymized diagnostics
+      description: Optional relevant log excerpt. Remove addresses, message contents, credentials and infrastructure identifiers.
+      render: text
