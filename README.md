@@ -1,9 +1,22 @@
 # Paperless-ngx Mail Header
 
-A lightweight, unofficial **Paperless-ngx 3** parser extension that adds an email's **sender, recipient, date and subject** above its existing HTML content in the generated PDF. Everything else stays with Paperless-ngx's native mail parser.
+A lightweight, unofficial **Paperless-ngx 3** parser extension for the **"HTML only"** email layout. It adds the email's **sender, recipient, date and subject** above the original HTML in the generated PDF, while leaving the rest of email processing to Paperless's native parser.
 
 > [!IMPORTANT]
 > This is an independent community extension. It is not affiliated with, endorsed by, or officially supported by Paperless-ngx.
+
+## Why this plugin?
+
+Paperless-ngx already includes email headers when it generates the **text version** of a message. So why use a plugin?
+
+The difference is the **"HTML only"** layout in Paperless mail rules:
+
+- **"Text, then HTML"** includes the email metadata, but also adds a text representation of the message. Depending on the email, this can duplicate the content in the PDF.
+- **"HTML only"** preserves the original HTML layout, images and formatting without that additional text section, but the usual email header is missing.
+
+**This plugin fills that specific gap.** It adds just **From, To, Date and Subject** above the HTML body. Paperless still handles the original email, attachment extraction, conversion, indexing and workflows through its native processing.
+
+If you're happy with Paperless's existing email output, you probably don't need this plugin.
 
 ![Anonymized example of the PDF email header](docs/images/mail-header-example.png)
 
