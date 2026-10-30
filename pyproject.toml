@@ -22,7 +22,7 @@ classifiers = [
 ]
 
 [project.optional-dependencies]
-test = ["pytest>=8,<10", "imap-tools>=1.14,<1.16", "Babel==2.18.0"]
+test = ["pytest>=8,<10", "imap-tools>=1.14,<1.17", "Babel==2.18.0"]
 
 [project.entry-points."paperless_ngx.parsers"]
 paperless_mail_header = "paperless_ngx_mail_header.parser:MailHeaderParser"
