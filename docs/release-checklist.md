@@ -2,6 +2,8 @@
 
 Complete these checks before an authorized GitHub release. Production deployment and PyPI upload are separate actions. Use the version in pyproject.toml; never replace an already published tag or release asset with a new candidate.
 
+Release tags matching `v*` are protected against updates and deletion. Create a new version tag for each release; the ruleset permits new tags and does not provide a bypass for replacing existing ones.
+
 ## Required checks
 
 - Pass the offline test/build/package matrix on supported Python versions.
