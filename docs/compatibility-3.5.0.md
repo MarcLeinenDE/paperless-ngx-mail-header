@@ -1,6 +1,6 @@
-# Paperless 3.5.0 compatibility — v0.3.2 candidate
+# Paperless 3.5.0 compatibility — v0.3.2
 
-Status: **source-reviewed, not yet real-stack verified**. This page is a test plan, not a completed release report.
+Status: **source-reviewed and real-stack verified with synthetic inputs** on Paperless 3.3.0 and 3.5.0. See the [completed PR validation and final-release evidence procedure](integration-report-0.3.2.md). Production verification remains separate.
 
 ## Confirmed upstream behavior
 
@@ -12,9 +12,9 @@ Source: https://github.com/paperless-ngx/paperless-ngx/blob/v3.5.0/src/paperless
 
 ## Compatibility strategy
 
-The 0.3.2 candidate accepts and forwards `**kwargs` on its `generate_pdf_from_html` override. It does **not** set `convert_to_pdfa` itself, so Paperless 3.3.0 sees its original call and Paperless 3.5.0 receives its requested flag. All other email conversion and final PDF/A work stays native.
+Plugin 0.3.2 accepts and forwards `**kwargs` on its `generate_pdf_from_html` override. It does **not** set `convert_to_pdfa` itself, so Paperless 3.3.0 sees its original call and Paperless 3.5.0 receives its requested flag. All other email conversion and final PDF/A work stays native.
 
-## Release verification required
+## Verification contract
 
 - Offline tests must simulate 3.3.0 and 3.5.0 native signatures and verify the 3.5.0 PDF/A flag is forwarded as `False` (and the default `True` when directly invoked).
 - The same wheel must pass real-stack English/German language and Berlin/New York/UTC time-zone scenarios for **both** Paperless versions.

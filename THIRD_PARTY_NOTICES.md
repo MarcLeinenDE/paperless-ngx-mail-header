@@ -4,7 +4,7 @@
 
 - Upstream: <https://github.com/paperless-ngx/paperless-ngx>
 - License: GNU General Public License version 3 (GPLv3)
-- Interface source-inspected: Paperless-ngx `3.3.0`, `3.3.4` and `3.5.0`. Version 3.5.0 adds the `convert_to_pdfa` keyword to the native HTML conversion hook; the 0.3.2 candidate forwards native keyword arguments unchanged. Production compatibility observations and synthetic integration tests have separate [scope and limits](docs/testing.md).
+- Interface source-inspected: Paperless-ngx `3.3.0`, `3.3.4` and `3.5.0`. Version 3.5.0 adds the `convert_to_pdfa` keyword to the native HTML conversion hook; plugin 0.3.2 forwards native keyword arguments unchanged. Production compatibility observations and synthetic integration tests have separate [scope and limits](docs/testing.md).
 - Relationship: the plugin **inherits** the native `paperless.parsers.mail.MailDocumentParser`, calls its methods and registers with `paperless_ngx.parsers`. It does **not** include verbatim upstream Paperless source files.
 
 Paperless-ngx authors retain ownership of their project and trademarks. Its GPL applies to Paperless itself; this extension independently licenses its own project-authored source under GPL-3.0-or-later.
