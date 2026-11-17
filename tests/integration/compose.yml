@@ -18,7 +18,7 @@ services:
     volumes:
       - ../../work/integration/assets:/assets:ro
   native:
-    image: ghcr.io/paperless-ngx/paperless-ngx:3.3.0
+    image: ghcr.io/paperless-ngx/paperless-ngx:${SMOKE_PAPERLESS_VERSION:-3.3.0}
     depends_on: [broker, gotenberg, tika, assets]
     ports: ["127.0.0.1:8000:8000"]
     environment: &paperless
@@ -40,6 +40,8 @@ services:
     build:
       context: ../..
       dockerfile: tests/integration/Dockerfile
+      args:
+        PAPERLESS_VERSION: ${SMOKE_PAPERLESS_VERSION:-3.3.0}
     depends_on: [broker, gotenberg, tika, assets]
     ports: ["127.0.0.1:8001:8000"]
     environment:

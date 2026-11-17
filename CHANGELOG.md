@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.3.2] — 2026-11-17
+
+- Restore compatibility with Paperless-ngx 3.5.0: forward the native HTML converter's new `convert_to_pdfa` keyword without changing the inserted header or PDF/A handling.
+- Retain compatibility with Paperless-ngx 3.3.0: only forward keyword arguments supplied by the native parser; do not force the new option on older releases.
+- Parameterize offline native-parser contract tests and the disposable real-stack integration matrix across Paperless 3.3.0 and 3.5.0, preserving all language and time-zone scenarios.
+- No change to MIME handling, attachment delegation, HTML escaping, translations, settings or existing PDFs.
+
 ## [0.3.1] — 2026-10-29
 
 - Replace the hardcoded Europe/Berlin HTML-header time zone with the effective Paperless `settings.TIME_ZONE`, configured via `PAPERLESS_TIME_ZONE`.

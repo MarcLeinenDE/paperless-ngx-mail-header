@@ -44,7 +44,7 @@ jobs:
           from paperless_ngx_mail_header.i18n import supported_languages
           base = 'tests/integration/compose.yml'
           zoned = base + ':tests/integration/compose.timezone.yml'
-          matrix = {'include': [
+          scenarios = [
               {'scenario': code, 'language': code, 'timezone': 'Europe/Berlin',
                'timezone_set': 'true', 'compose': zoned if code == 'en' else zoned + ':tests/integration/compose.localized.yml'}
               for code in supported_languages()
@@ -53,6 +53,12 @@ jobs:
                'timezone_set': 'true', 'compose': zoned},
               {'scenario': 'en-utc-default', 'language': 'en', 'timezone': 'UTC',
                'timezone_set': 'false', 'compose': base},
+          ]
+          matrix = {'include': [
+              {**case, 'paperless_version': version,
+               'scenario': f'{version}-{case["scenario"]}'}
+              for version in ('3.3.0', '3.5.0')
+              for case in scenarios
           ]}
           print('matrix=' + json.dumps(matrix))
           PY
@@ -74,6 +80,7 @@ jobs:
     env:
       COMPOSE_FILE: ${{ matrix.compose }}
       SMOKE_LANGUAGE: ${{ matrix.language }}
+      SMOKE_PAPERLESS_VERSION: ${{ matrix.paperless_version }}
       SMOKE_SCENARIO: ${{ matrix.scenario }}
       SMOKE_TIME_ZONE: ${{ matrix.timezone }}
       SMOKE_TIME_ZONE_SET: ${{ matrix.timezone_set }}

@@ -18,7 +18,7 @@ from .i18n import LANGUAGE_ENV
 
 class MailHeaderParser(NativeMailDocumentParser):
     name = "Paperless-ngx Mail Header"
-    version = "0.3.1"
+    version = "0.3.2"
     author = "Marc Leinen"
     url = "https://github.com/MarcLeinenDE/paperless-ngx-mail-header"
 
@@ -37,7 +37,7 @@ class MailHeaderParser(NativeMailDocumentParser):
         finally:
             self._header_mail_message = None
 
-    def generate_pdf_from_html(self, orig_html, attachments):
+    def generate_pdf_from_html(self, orig_html, attachments, **kwargs):
         message = getattr(self, "_header_mail_message", None)
         if message is not None:
             # Use Paperless's effective configuration, including its UTC default.
@@ -48,4 +48,5 @@ class MailHeaderParser(NativeMailDocumentParser):
             orig_html = add_header_to_html(orig_html, header)
         # Native implementation still handles scripts, inline CID assets,
         # Gotenberg, page layout and PDF/A exactly as before.
-        return super().generate_pdf_from_html(orig_html, attachments)
+        # Pass through native options, e.g. convert_to_pdfa=False on Paperless 3.5.0.
+        return super().generate_pdf_from_html(orig_html, attachments, **kwargs)

@@ -188,7 +188,11 @@ def run() -> None:
     time_zone = os.environ.get('SMOKE_TIME_ZONE', 'UTC')
     time_zone_set = os.environ.get('SMOKE_TIME_ZONE_SET', 'false') == 'true'
     versions = {kind: version(kind) for kind in ('native', 'plugin')}
+    paperless_version = os.environ.get('SMOKE_PAPERLESS_VERSION', '3.3.0')
     for actual in versions.values():
+        assert actual['paperless'].startswith(paperless_version), (
+            f"Expected Paperless {paperless_version}, got {actual['paperless']}"
+        )
         assert actual['time_zone'] == time_zone, 'Unexpected effective Paperless timezone'
         assert actual['time_zone_env'] == (time_zone if time_zone_set else None), (
             'Default timezone scenario must leave PAPERLESS_TIME_ZONE absent'
@@ -262,6 +266,7 @@ def run() -> None:
               'wheel_sha256': sha(wheel.read_bytes()), 'versions': versions,
               'header_language': language,
               'scenario': os.environ.get('SMOKE_SCENARIO', language),
+              'paperless_version_under_test': paperless_version,
               'time_zone': time_zone, 'time_zone_setting_present': time_zone_set,
               'dependencies': {'gotenberg': '8.37', 'tika_image': '3.3.1.0', 'broker_image': 'valkey:9-alpine'},
               'documents_per_stack': len(accepted), 'results': observed,

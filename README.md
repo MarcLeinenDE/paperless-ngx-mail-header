@@ -38,6 +38,7 @@ If you're happy with Paperless's existing email output, you probably don't need 
 | --- | --- | --- |
 | Paperless-ngx `3.3.0` — production | **LIVE_VERIFIED (operator-reported)** | `0.3.1`: one real HTML newsletter import, German/Berlin; [tested versions, scope and limits](docs/production-report-0.3.1.md) |
 | Paperless-ngx `3.3.0` — synthetic CI | **Real-stack verified with synthetic inputs** | `0.3.1`: English/German in Berlin, English in New York and UTC with no time-zone setting; 13 successful documents per native/plugin stack in each scenario plus matching invalid-sender rejection; [report](docs/integration-report-0.3.1.md) |
+| Paperless-ngx `3.3.0` / `3.5.0` — synthetic CI | **Real-stack verified with synthetic inputs** | `0.3.2`: eight version/language/time-zone scenarios, 13 successful documents per native/plugin stack plus matching invalid-sender rejection; [report and evidence scope](docs/integration-report-0.3.2.md) |
 | Paperless-ngx other 3.x releases | **Not verified** | Parser internals can change between versions |
 | Unit test suite | **Unit tested** | Offline tests on Python 3.12–3.14, with a separate real-stack matrix for every shipped language plus New York and unset-time-zone scenarios |
 | Plain-text-only `.eml` | **Native fallback verified** | Real PDF text/page count match the native baseline |
@@ -84,7 +85,7 @@ The extension is distributed as a Python wheel through this repository's [GitHub
 ### Installing the wheel
 
 1. Open the [latest stable release](https://github.com/MarcLeinenDE/paperless-ngx-mail-header/releases/latest).
-2. Download the wheel and `SHA256SUMS.txt` from the same release. For `v0.3.1`, the wheel is `paperless_ngx_mail_header-0.3.1-py3-none-any.whl`.
+2. Download the wheel and `SHA256SUMS.txt` from the same release. For `v0.3.2`, the wheel is `paperless_ngx_mail_header-0.3.2-py3-none-any.whl`. The published GitHub Release is authoritative for availability and final-commit evidence.
 3. Verify the wheel's SHA-256 against its entry in `SHA256SUMS.txt`.
 4. Install the wheel with `--no-deps` in the **same Python environment used by Paperless**.
 5. Restart the Paperless processes that load the parser registry, including the consumer, workers and webserver as applicable, then verify parser selection below.
