@@ -2,7 +2,7 @@
 
 ## Requirements
 
-- Paperless-ngx with the `paperless_ngx.parsers` entry point (validated on `3.3.0`).
+- Paperless-ngx with the `paperless_ngx.parsers` entry point (0.3.1 verified on `3.3.0`; 0.3.2 candidate targets `3.3.0` and `3.5.0`, pending release gates).
 - Python `>=3.12` in the environment running the Paperless consumer / worker processes.
 - Installed Paperless runtime dependencies; no standalone PDF renderer is supplied by this extension.
 
@@ -16,6 +16,8 @@ python -m build
 The built wheel is produced under `dist/`. Exact filename depends on version.
 
 ## GitHub release files
+
+**Compatibility in 0.3.2 (pending release):** forwards the new Paperless 3.5.0 HTML-to-PDF option while remaining compatible with 3.3.0. Install it only after a published release and passing integration checks; v0.3.1 is not compatible with 3.5.0 for HTML messages.
 
 **Upgrading to 0.3.1:** the header now uses the Paperless-configured time zone (`PAPERLESS_TIME_ZONE`), defaulting to UTC. Earlier versions always used Europe/Berlin. Set `PAPERLESS_TIME_ZONE=Europe/Berlin` in Paperless to preserve that behavior. See [header time zone](configuration.md#header-time-zone).
 

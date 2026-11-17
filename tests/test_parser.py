@@ -10,8 +10,8 @@ from types import ModuleType, SimpleNamespace
 import pytest
 
 
-@pytest.fixture
-def parser_class(monkeypatch):
+@pytest.fixture(params=("3.3.0", "3.5.0"))
+def parser_class(monkeypatch, request):
     monkeypatch.delenv('PAPERLESS_MAIL_HEADER_LANGUAGE', raising=False)
     class NativeMailParser:
         @classmethod
@@ -21,6 +21,10 @@ def parser_class(monkeypatch):
         def generate_pdf(self, mail_message, pdf_layout=None):
             self.layout_seen = pdf_layout
             if mail_message.html:
+                if request.param == "3.5.0":
+                    return self.generate_pdf_from_html(
+                        mail_message.html, mail_message.attachments, convert_to_pdfa=False,
+                    )
                 return self.generate_pdf_from_html(mail_message.html, mail_message.attachments)
             return ('text-native', mail_message.text, mail_message.attachments)
 
@@ -29,10 +33,23 @@ def parser_class(monkeypatch):
                 raise RuntimeError('native conversion failed')
             return ('native-html', orig_html, attachments)
 
+    if request.param == "3.5.0":
+        class NativeMailParser350(NativeMailParser):
+            def generate_pdf_from_html(
+                self, orig_html, attachments, *, convert_to_pdfa=True,
+            ):
+                self.convert_to_pdfa_seen = convert_to_pdfa
+                return super().generate_pdf_from_html(orig_html, attachments)
+
+        native_parser = NativeMailParser350
+    else:
+        native_parser = NativeMailParser
+
+    native_parser.paperless_version = request.param
     packages = {name: ModuleType(name) for name in ('paperless', 'paperless.parsers', 'paperless.parsers.mail')}
     packages['paperless'].__path__ = []
     packages['paperless.parsers'].__path__ = []
-    packages['paperless.parsers.mail'].MailDocumentParser = NativeMailParser
+    packages['paperless.parsers.mail'].MailDocumentParser = native_parser
     packages['django'] = ModuleType('django')
     packages['django'].__path__ = []
     packages['django.conf'] = ModuleType('django.conf')
@@ -72,6 +89,8 @@ def test_html_conversion_delegates_to_native_with_untouched_attachments(parser_c
     assert result[1].count('data-paperless-mail-header="1"') == 1
     assert result[1].replace(result[1][result[1].index('<div data-paperless-mail-header'):result[1].index('</table></div>') + len('</table></div>')], '') == m.html
     assert parser.layout_seen == 3
+    if parser_class.paperless_version == "3.5.0":
+        assert parser.convert_to_pdfa_seen is False
     assert parser._header_mail_message is None
 
 
@@ -88,6 +107,13 @@ def test_native_html_converter_called_unmodified_without_context(parser_class):
     sample = '<html><body>raw HTML</body></html>'
     attachments = [object()]
     assert parser.generate_pdf_from_html(sample, attachments) == ('native-html', sample, attachments)
+    if parser_class.paperless_version == "3.5.0":
+        assert parser.convert_to_pdfa_seen is True
+        # An explicit new native option must survive even outside generate_pdf().
+        assert parser.generate_pdf_from_html(
+            sample, attachments, convert_to_pdfa=False,
+        ) == ('native-html', sample, attachments)
+        assert parser.convert_to_pdfa_seen is False
 
 
 def test_no_context_leak_after_exception(parser_class):

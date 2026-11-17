@@ -11,7 +11,7 @@ python -m pip install -e '.[test]'
 python -m pytest -q
 ```
 
-The offline suite uses pure formatter tests plus a test double for the native Paperless `MailDocumentParser`. This validates narrow method delegation, **not** full Gotenberg/Tika/Paperless integration.
+The offline suite uses pure formatter tests plus version-parameterized test doubles for the native Paperless `MailDocumentParser` (`3.3.0` and `3.5.0`). This validates narrow method delegation, **not** full Gotenberg/Tika/Paperless integration.
 
 ## Minimum integration matrix
 
@@ -28,7 +28,7 @@ The offline suite uses pure formatter tests plus a test double for the native Pa
 
 ## Disposable real-stack integration
 
-The `Real Paperless integration` GitHub Actions workflow starts fresh native and plugin-enabled Paperless `3.3.0` containers with Gotenberg `8.37` and Tika `3.3.1.0`. It builds and installs the actual candidate wheel with `--no-deps`. REST uploads are processed by real Celery workers and the real parser registry; generated PDFs and searchable text are compared with the native baseline.
+The `Real Paperless integration` GitHub Actions workflow starts fresh native and plugin-enabled Paperless `3.3.0` **and** `3.5.0` containers for each language/time-zone scenario, with Gotenberg `8.37` and Tika `3.3.1.0`. (A candidate configuration does not imply its tests have passed.) It builds and installs the actual candidate wheel with `--no-deps`. REST uploads are processed by real Celery workers and the real parser registry; generated PDFs and searchable text are compared with the native baseline.
 
 The synthetic cases cover HTML, plain text, CID and controlled external images, HTML with a PDF attachment, Unicode/escaping, mixed line separators, missing header fields and both DST transitions. The PDF attachment is also uploaded as a separate document. The test compares document counts, unchanged original bytes, PDF text, image presence and registry selection. The controlled image server is internal to this disposable network; no real mail is sent or fetched.
 
